@@ -29,7 +29,7 @@ Run dtop.
 
 Then point your webbrowser at http://localhost:12345 and you should see:
 
-![Image](../blob/master/screenshot.png?raw=true)
+![Image](/screenshot.png?raw=true)
 
 ## features ##
 
