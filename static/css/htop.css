@@ -1,0 +1,101 @@
+.progress {
+	padding: 0px;
+}
+
+.system-info-table {
+	width: 100% !important;
+	border: 0px !important;
+}
+
+.process-command {
+
+}
+
+.meter-container {
+	display: table;
+	table-layout:fixed;
+	width: 100%;
+}
+
+.meter-row {
+	display: table-row;
+}
+
+.info-alert {
+	color: #f04124 !important;
+	font-weight: bold;
+}
+
+.info-warning {
+	color: #f08a24 !important;
+}
+
+.info-normal {
+	color: #008cba !important;
+}
+
+.meter-label {
+	display: table-cell;
+	text-align: center;
+	width: 20px;
+	vertical-align:middle;
+	padding: 1px;
+	font-size: 12px;
+	border: 1px solid #f6f6f6;
+	/*border-left: 1px solid #f6f6f6;*/
+	/*background-color: red;*/
+}
+
+.meter-value {
+	display: table-cell;
+	text-align: left;
+	width: 120px;
+	font-size: 12px;
+	vertical-align:middle;
+	padding: 1px;
+	border: 1px solid #f6f6f6;
+	/*background-color: red;*/
+}
+
+.meter {
+	display: inline-block !important;
+	clear: none !important;
+	/*
+	-webkit-border-radius: 5px !important;
+	border-radius: 5px !important;*/
+}
+
+.progress {
+	/*-webkit-border-radius: 5px !important;
+	border-radius: 5px !important;*/
+	margin-bottom: 0px !important;
+	border: 1px solid #f6f6f6;
+	background-color: #ffffff !important;
+	display: table-cell !important;
+}
+
+.memory-used {
+	background-color: #43ac6a !important;
+	/*-webkit-border-radius: Opx !important;
+	border-radius: 0px !important;
+	-webkit-border-top-left-radius: 5px !important;
+	border-top-left-radius: 5px !important;
+	-webkit-border-bottom-left-radius: 5px !important;
+	border-bottom-left-radius: 5px !important;*/
+}
+
+.memory-buffers {
+	background-color: rgb(43, 166, 203) !important;
+	/*-webkit-border-radius: Opx !important;
+	border-radius: 0px !important;*/
+}
+
+.memory-cache {
+	background-color: #f08a24 !important;
+	/*-webkit-border-radius: Opx !important;
+	border-radius: 0px !important;
+	-webkit-border-top-right-radius: 5px !important;
+	border-top-right-radius: 5px !important;
+	-webkit-border-bottom-right-radius: 5px !important;
+	border-bottom-right-radius: 5px !important;*/
+}
