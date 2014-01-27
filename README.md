@@ -15,6 +15,8 @@ Clone the repo and cd into it.
 > git clone https://github.com/ddierickx/dtop
 > cd dtop
 
+### run adhoc
+
 Set your GOPATH.
 
 > export GOPATH=`pwd`
@@ -30,6 +32,18 @@ Run dtop.
 Then point your webbrowser at http://localhost:12345 and you should see:
 
 ![Image](/screenshot.png?raw=true)
+
+### run as a daemon
+
+> cd scripts
+
+Now run the installation script which will install dtop to `/opt/dtop` and register the daemon within init.d.
+
+> ./install-dtopd.sh
+
+You can start, stop, status and restart the service as usual:
+
+> sudo service dtopd status
 
 ## features ##
 
