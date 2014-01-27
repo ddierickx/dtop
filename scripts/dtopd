@@ -11,7 +11,6 @@
 ### END INIT INFO
 
 # Quick start-stop-daemon example, derived from Debian /etc/init.d/ssh
-set -e
  
 # Must be a valid filename
 NAME=dtopd
@@ -20,29 +19,35 @@ PIDFILE=/var/run/$NAME.pid
 DAEMON_ROOT=/opt/dtop
 DAEMON=/opt/dtop/dtop
 DAEMON_OPTS="--port 12345"
- 
+SS="start-stop-daemon"
+
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
  
 case "$1" in
   start)
-        echo -n "Starting daemon: "$NAME
-	start-stop-daemon --start --background -d $DAEMON_ROOT --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS
-        echo "."
+    echo -n "Starting daemon: "$NAME"\n"
+	$SS --start --background -d $DAEMON_ROOT --pidfile $PIDFILE --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
 	;;
   stop)
-        echo -n "Stopping daemon: "$NAME
-	start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
-        echo "."
+    echo -n "Stopping daemon: "$NAME"\n"
+	$SS --stop --quiet --oknodo --pidfile $PIDFILE
+	rm $PIDFILE
+	;;
+  status)
+    echo -n "Status of daemon $NAME: "
+	$SS --status --pidfile $PIDFILE
+	EC=$?
+	test 0 -eq $EC && echo "running"
+	test 0 -ne $EC && echo "not running"
+	exit $EC
 	;;
   restart)
-        echo -n "Restarting daemon: "$NAME
-	start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile $PIDFILE
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS
-	echo "."
+    echo -n "Restarting daemon: "$NAME"\n"
+	$SS --stop --quiet --oknodo --retry 30 --pidfile $PIDFILE
+	$SS --start --background -d $DAEMON_ROOT --pidfile $PIDFILE --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
 	;;
- 
   *)
-	echo "Usage: "$1" {start|stop|restart}"
+	echo "Usage: "$1" {start|stop|status|restart}"
 	exit 1
 esac
  
