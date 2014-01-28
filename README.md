@@ -30,7 +30,7 @@ Run dtop.
 
 > ./dtop
 
-Then point your webbrowser at http://localhost:12345 and you should see:
+Then point your webbrowser at http://localhost:12345 and you should see (screenshot may not be up to date):
 
 ![Image](/screenshot.png?raw=true)
 
@@ -54,10 +54,13 @@ You can start, stop, status and restart the service as usual:
 *	load avg
 *	users
 *	basic search functionality
+*   cpu usage summary in page title
 
 ## todo ##
 
+*   make (install) script based on install-dtopd.sh
 *	user defined sorting iso. cpu percentage
+*   a nice favicon/logo
 *	processtree
 *	basic (?) authentication
 *	process kill feature
