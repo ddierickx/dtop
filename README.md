@@ -59,6 +59,7 @@ You can start, stop, status and restart the service as usual:
 ## todo ##
 
 *   make (install) script based on install-dtopd.sh
+*   use a sparkline instead of a bar chart for cpu/mem usage
 *	user defined sorting iso. cpu percentage
 *   a nice favicon/logo
 *	processtree
