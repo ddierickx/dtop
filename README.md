@@ -63,6 +63,7 @@ You can start, stop, status and restart the service as usual:
 *	user defined sorting iso. cpu percentage
 *   a nice favicon/logo
 *	processtree
+*	hint full command text on mouseover
 *	basic (?) authentication
 *	process kill feature
 *	htop like keyboard shortcuts
