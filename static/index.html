@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
     <meta name="author" content="Dominique Dierickx">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dtop</title>
+    <title data-bind="text: title()">dtop</title>
     <link rel="stylesheet" href="css/foundation.css" />
     <link rel="stylesheet" type="text/css" href="css/htop.css"> 
 	<script type="text/javascript" src="js/knockout-3.0.0.js"></script>
@@ -15,7 +15,7 @@
 	<nav class="top-bar" data-topbar>
 	  <ul class="title-area">
 	    <li class="name">
-	      <h1><a href="#" data-bind="text: 'dtop @ ' + hostname()"></a></h1>
+	      <h1><a href="#" data-bind="text: 'dtop@' + hostname()"></a></h1>
 	    </li>	    
 	  </ul>
 
@@ -99,6 +99,9 @@
     <script src="js/jquery.js"></script>
     <script src="js/foundation.min.js"></script>
     <script>
+      // string repeat
+	  String.prototype.repeat = function(num) { return new Array( num + 1 ).join( this ); }
+
       // generic sortby object property.
 	  function sortBy(field, reverse, primer){
 		   var key = primer ? 
@@ -150,7 +153,22 @@
 				self.hostname = ko.observable("?");
 				self.process_count = ko.observable(0);
 
-			    this.processGridViewModel = new ko.simpleGrid.viewModel({
+				self.title = ko.computed(function() {
+					var cpus = self.cpu();
+					var usage = 0;
+					for (i = 0; i < cpus.length; i++) {
+						usage += cpus[i].Usage;
+					}
+
+					if (cpus.length > 0) {
+						var val = Math.ceil( ( (usage / cpus.length) ) / 20 );
+						return "■".repeat(val) + "□".repeat(5 - val);
+					} else {
+						return "dtop";
+					}
+				}, self);
+
+			    self.processGridViewModel = new ko.simpleGrid.viewModel({
 			        data: self.processes,
 			        columns: [
 			            { headerText: "Pid", rowText: "Pid" },
