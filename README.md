@@ -20,7 +20,7 @@ Clone the repo and cd into it.
 
 Set your GOPATH.
 
-> export GOPATH=`pwd`
+> export GOPATH=$(pwd)
 
 Compile the package.
 
