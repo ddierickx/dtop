@@ -13,6 +13,7 @@ dtop is developed in [Go](http://golang.org) so you need the go compiler.
 Clone the repo and cd into it.
 
 > git clone https://github.com/ddierickx/dtop
+
 > cd dtop
 
 ### run adhoc
@@ -39,7 +40,7 @@ Then point your webbrowser at http://localhost:12345 and you should see:
 
 Now run the installation script which will install dtop to `/opt/dtop` and register the daemon within init.d.
 
-> ./install-dtopd.sh
+> sudo ./install-dtopd.sh
 
 You can start, stop, status and restart the service as usual:
 
