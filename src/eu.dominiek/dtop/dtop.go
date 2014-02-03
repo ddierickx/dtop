@@ -20,8 +20,9 @@ func main() {
     flag.Parse()
 
     events := make(chan Event)
+
     // registered publishers
-    eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo, hostname}
+    eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo}
     
     // start publishers as parallel.
     for _, eventPublisher := range eventPublishers {   
@@ -29,6 +30,7 @@ func main() {
     }
 
     eventServer := NewEventServer(events, jsonEventSerializer)
+    eventServer.oneTimeEvents = append(eventServer.oneTimeEvents, consumeOnce(basicinfo))
 
     // start fanout and monitor goroutines.
     go eventServer.fanOut()
@@ -45,6 +47,12 @@ func main() {
     }
 }
 
+func consumeOnce(publisher EventPublisher) Event {
+    c := make(chan Event)
+    go publisher(c)
+    return <-c
+}
+
 func Debugf(format string, args ...interface{}) { 
     if *debug { 
         log.Printf("DEBUG "+format, args) 
@@ -57,6 +65,7 @@ type EventServer struct {
     events chan Event // input channel
     eventListenersMutex sync.RWMutex
     eventListeners []chan Event // fan-out channels
+    oneTimeEvents []Event
     eventSerializer EventSerializer
 }
 
@@ -91,6 +100,7 @@ func fanOutSafe(listener chan Event, event Event) {
     defer func() {
         if err := recover(); err != nil {
             // swallow closed channel error
+            // http://stackoverflow.com/questions/16105325/how-to-check-a-channel-is-closed-or-not-without-reading-it
         }
     }()
     listener <- event
@@ -123,11 +133,19 @@ func NewEventServer(events chan Event, eventSerializer EventSerializer) *EventSe
     return eventServer
 }
 
+func (eventServer *EventServer) submitOneTimeEvents(listener chan Event) {
+    for _, event := range eventServer.oneTimeEvents {
+        listener <- event
+    }
+}
+
 // Client handler, register, monitor channel and transmit, unregister.
 func (eventServer *EventServer) handler(ws *websocket.Conn) {
     listener, listenerId := eventServer.register()
     // TODO: get actual client ip address.
     log.Printf("client connect %s (id=%d)", ws.Request().RemoteAddr, listenerId)
+
+    go eventServer.submitOneTimeEvents(listener)
 
     for {
         item, open := <-listener 

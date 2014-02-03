@@ -255,18 +255,31 @@ func uptime(events chan Event) {
 }
 
 // Use internal go os module to get the system hostname.
-func hostname(events chan Event) {
-    for {
-        hostname, err := os.Hostname()
+func basicinfo(events chan Event) {
+    hostname, hn_err := os.Hostname()
 
-        if err != nil {
-            panic(fmt.Sprintf("Unable to get hostname: '%s'", err))
-        }
-
-        events <- NewEvent("sys.hostname", hostname)
-
-        time.Sleep(DELAY)
+    if hn_err != nil {
+        panic(fmt.Sprintf("Unable to get hostname: '%s'", hn_err))
     }
+
+    release, rl_err := capture_stdout("lsb_release", "-sd")
+
+    if rl_err != nil {
+        panic(fmt.Sprintf("Unable to run lsb_release: '%s'", rl_err))
+    }
+
+    uname, un_err := capture_stdout("uname", "-sr")
+
+    fmt.Printf(hostname)
+    fmt.Printf(release[0])
+    fmt.Printf(uname[0])
+
+    if un_err != nil {
+        panic(fmt.Sprintf("Unable to run uname: '%s'", un_err))
+    }
+
+    // TODO: return object!
+    events <- NewEvent("sys.basic", release[0])
 }
 
 // Capture stdout when running the cmd with the given arguments. Output is split on newline.
