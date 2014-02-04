@@ -30,7 +30,6 @@ func main() {
     }
 
     eventServer := NewEventServer(events, jsonEventSerializer)
-    eventServer.oneTimeEvents = append(eventServer.oneTimeEvents, consumeOnce(basicinfo))
 
     // start fanout and monitor goroutines.
     go eventServer.fanOut()
@@ -47,12 +46,6 @@ func main() {
     }
 }
 
-func consumeOnce(publisher EventPublisher) Event {
-    c := make(chan Event)
-    go publisher(c)
-    return <-c
-}
-
 func Debugf(format string, args ...interface{}) { 
     if *debug { 
         log.Printf("DEBUG "+format, args) 
@@ -65,7 +58,7 @@ type EventServer struct {
     events chan Event // input channel
     eventListenersMutex sync.RWMutex
     eventListeners []chan Event // fan-out channels
-    oneTimeEvents []Event
+    lastEvents map[string]Event
     eventSerializer EventSerializer
 }
 
@@ -84,8 +77,9 @@ func (eventServer *EventServer) fanOut() {
     for event := range eventServer.events {
         // lock client connection channels list.
         eventServer.eventListenersMutex.RLock()
-
+        eventServer.lastEvents[event.Q] = event
         eventServer.eventsCount += 1
+        
         for _, listener := range eventServer.eventListeners {
             if listener != nil { // unregistered connected channels have nil values.
                 fanOutSafe(listener, event)
@@ -130,11 +124,12 @@ func NewEventServer(events chan Event, eventSerializer EventSerializer) *EventSe
     eventServer := new(EventServer)
     eventServer.events = events
     eventServer.eventSerializer = eventSerializer
+    eventServer.lastEvents = make(map[string]Event)
     return eventServer
 }
 
-func (eventServer *EventServer) submitOneTimeEvents(listener chan Event) {
-    for _, event := range eventServer.oneTimeEvents {
+func (eventServer *EventServer) submitLastEvents(listener chan Event) {
+    for _, event := range eventServer.lastEvents {
         listener <- event
     }
 }
@@ -145,7 +140,7 @@ func (eventServer *EventServer) handler(ws *websocket.Conn) {
     // TODO: get actual client ip address.
     log.Printf("client connect %s (id=%d)", ws.Request().RemoteAddr, listenerId)
 
-    go eventServer.submitOneTimeEvents(listener)
+    go eventServer.submitLastEvents(listener)
 
     for {
         item, open := <-listener 
