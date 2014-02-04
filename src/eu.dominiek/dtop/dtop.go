@@ -22,7 +22,7 @@ func main() {
     events := make(chan Event)
 
     // registered publishers
-    eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo}
+    eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo, basicinfo}
     
     // start publishers as parallel.
     for _, eventPublisher := range eventPublishers {   
@@ -132,6 +132,7 @@ func (eventServer *EventServer) submitLastEvents(listener chan Event) {
     for _, event := range eventServer.lastEvents {
         listener <- event
     }
+    listener <- NewEvent("sig.ready", "")
 }
 
 // Client handler, register, monitor channel and transmit, unregister.

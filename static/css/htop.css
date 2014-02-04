@@ -1,3 +1,8 @@
+.top-bar {
+	background-color: #01FF70 !important;
+	color: #001F3F !important;
+}
+
 .progress {
 	padding: 0px;
 }

@@ -6,6 +6,12 @@ type Event struct {
     V interface{} // value (can be any struct)
 }
 
+type BasicInfo struct {
+    Hostname string
+    SystemInfo string
+    DistributionInfo string
+}
+
 type CpuUsage struct {
 	CpuId int
 	Usage float64
@@ -55,6 +61,14 @@ func NewEvent(qualifier string, value interface{}) Event {
     event.Q = qualifier
     event.V = value
     return *event
+}
+
+func NewBasicInfo(hostname string, systemInfo string, distributionInfo string) BasicInfo {
+    basicInfo := new(BasicInfo)
+    basicInfo.Hostname = hostname
+    basicInfo.SystemInfo = systemInfo
+    basicInfo.DistributionInfo = distributionInfo
+    return *basicInfo
 }
 
 func NewMemoryUsage(totalKb int, freeKb int, sharedKb int, buffersKb int, cachedKb int, swapTotalKb int, swapFreeKb int) MemoryUsage {

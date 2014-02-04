@@ -270,16 +270,12 @@ func basicinfo(events chan Event) {
 
     uname, un_err := capture_stdout("uname", "-sr")
 
-    fmt.Printf(hostname)
-    fmt.Printf(release[0])
-    fmt.Printf(uname[0])
-
     if un_err != nil {
         panic(fmt.Sprintf("Unable to run uname: '%s'", un_err))
     }
 
-    // TODO: return object!
-    events <- NewEvent("sys.basic", release[0])
+    basicInfo := NewBasicInfo(hostname, uname[0], release[0])
+    events <- NewEvent("sys.basics", basicInfo)
 }
 
 // Capture stdout when running the cmd with the given arguments. Output is split on newline.
