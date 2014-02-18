@@ -33,34 +33,21 @@
       <div class="large-6 columns">
 		<div id="cpu-meters" class="meter-container">
 		</div>
-      	<!--
-      	<div data-bind="foreach: cpu" class="meter-container">
-      		<div class="meter-row">
-      			<span class="meter-label" data-bind="text: $index"></span>
-				<div class="progress">
-					<div class="meter" data-bind="style: { width: Usage + '%' }"></div>
-				</div>
-				<span class="meter-value" data-bind="text: (Math.round(Usage*10)/10).toFixed(1) + '%'"></span>
-			</div>
-		</div>
-		-->
 
 		<div class="meter-container">
-			<span class="meter-label">m</span>
-			<div class="meter-row progress" style="font-size: 0em !important;">
-				<span class="meter memory-used" data-tooltip class="has-tip" style="display: inline-block" data-bind="style: { width: ( (memory_used() / memory().TotalKb) * 100 ) + '%' }, attr { title: 'Used: ' + (Math.floor(memory_used() / 1024)) + ' MB' }"></span>
-		    	<span class="meter memory-buffers" data-tooltip class="has-tip" style="display: inline-block" data-bind="style: { width: ( (memory().BuffersKb / memory().TotalKb) * 100) + '%' }, attr { title: 'Buffers: ' + (Math.floor(memory().BuffersKb / 1024)) + ' MB' }"></span>
-		   		<span class="meter memory-cache" data-tooltip class="has-tip" style="display: inline-block" data-bind="style: { width: ( (memory().CachedKb / memory().TotalKb) * 100) + '%' }, attr { title: 'Cached: ' + (Math.floor(memory().CachedKb / 1024)) + ' MB' }"></span>
-		   	</div>
-		   	<span class="meter-value" data-bind="text: Math.round(memory_used() / 1024) + '/' + Math.floor(memory().TotalKb/1024) + 'MB'"></span>
+			<div class="meter-row">
+				<span class="meter-label">m</span>
+				<div id="memory-meter"></div>
+			   	<span class="meter-value" data-bind="text: Math.round(memory_used() / 1024) + '/' + Math.floor(memory().TotalKb/1024) + 'MB'"></span>
+            </div>
 		</div>
 
 		<div class="meter-container">
-			<span class="meter-label">s</span>
-			<div class="meter-row progress" style="font-size: 0px !important;">
-				<span class="meter" data-bind="style: { width: memory_swapped() / memory().SwapTotalKb + '%' }"></span>
+			<div class="meter-row" style="font-size: 0px !important;">
+				<span class="meter-label">s</span>
+				<div id="swapped-meter"></div>
+			   	<span class="meter-value" data-bind="text: Math.round(memory_swapped() / 1024) + '/' + Math.floor(memory().SwapTotalKb/1024) + 'MB'"></span>
 			</div>
-			<span class="meter-value" data-bind="text: Math.round(memory_swapped() / 1024) + '/' + Math.floor(memory().SwapTotalKb/1024) + 'MB'"></span>
 		</div>
       </div>
   	  <div class="large-6 columns">
@@ -92,7 +79,7 @@
 		</table>
       </div>
     </div>
-
+    <p>&nbsp;</p>
     <div class="row">
     	<div class="large-12 columns">
     		<div data-bind="simpleGrid: processGridViewModel"></div>
@@ -145,6 +132,7 @@
       			var self = this;
 
       			/* consts */
+      			self.slice = function(ar) { return ar.slice(Math.max(ar.length - 100, 0), ar.length) };
 				self.LOADAVG_LIMIT_WARNING = 0.50
 				self.LOADAVG_LIMIT_ALERT = 0.70;
 
@@ -223,21 +211,42 @@
         		self.cpu.subscribe(function(cpus) {
         			if (viewModel.initialized()) {
 						for (i = 0; i < cpus.length; i++) {
-							self.usages[i].push(Math.round(cpus[i].Usage));
-							$('#core_progress_' + i).sparkline(self.usages[i], { type: 'line', barColor: 'blue', width: '100%', height: '100%' } );
+							self.cpu_usages[i].push(Math.round(cpus[i].Usage));
+							self.cpu_usages[i] = self.slice(self.cpu_usages[i]);
+							$('#core_progress_' + i).sparkline(self.cpu_usages[i], { type: 'line', lineColor: '#2ba6cb', width: '100%', height: '100%', chartRangeMin: 0, chartRangeMax: 100 } );
 							$('#core_value_' + i).text(Math.round(cpus[i].Usage) + "%");
 						}   				 	
 					}
    				});
+
+        		self.memory_usage = { Used: [], Buffers: [], Cached: [], Swapped: [] };
+   				self.memory.subscribe(function(memory) {
+   					self.memory_usage.Used.push(Math.round((self.memory_used() / self.memory().TotalKb) * 100));
+   					self.memory_usage.Buffers.push(Math.round((self.memory().BuffersKb / self.memory().TotalKb) * 100));
+   					self.memory_usage.Cached.push(Math.round((self.memory().CachedKb / self.memory().TotalKb) * 100));
+   					self.memory_usage.Swapped.push(Math.round((self.memory_swapped() / self.memory().SwapTotalKb) * 100));
+   					self.memory_usage.Used = self.slice(self.memory_usage.Used);
+   					self.memory_usage.Buffers = self.slice(self.memory_usage.Buffers);
+   					self.memory_usage.Cached = self.slice(self.memory_usage.Cached);
+   					self.memory_usage.Swapped = self.slice(self.memory_usage.Swapped);
+   					var options_used = { type: 'line', lineColor: '#43ac6a', fillColor: '#A0EDBC', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
+   					var options_buffers = { type: 'line', composite: true, lineColor: '#2ba6cb', fillColor: '#95D5E9', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
+   					var options_cached = { type: 'line', composite: true, lineColor: '#f08a24', fillColor: '#FFD3A7', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
+   					var options_swapped = { type: 'line', lineColor: '#FF8282', fillColor: '#FF8282', width: '100%', height: '20px', chartRangeMin: 0, chartRangeMax: 100 };
+   					$("#memory-meter").sparkline( self.memory_usage.Used, options_used );
+   					$("#memory-meter").sparkline( self.memory_usage.Cached, options_cached );
+   					$("#memory-meter").sparkline( self.memory_usage.Buffers, options_buffers );
+   					$("#swapped-meter").sparkline( self.memory_usage.Swapped, options_swapped );
+				});
 			};
 
 			function initializeMeters(viewModel) {
 				var cpus = viewModel.cpu();
-				viewModel.usages = [];
+				viewModel.cpu_usages = [];
 				cpu_view = $("#cpu-meters");
 
 				for (i = 0; i < cpus.length; i++) {
-					viewModel.usages[i] = [];
+					viewModel.cpu_usages[i] = [];
 					core_div = "<div id='core_row_" + i + "' class='meter-row'>" +
 									"<span id='core_label_" + i + "' class='meter-label'>" + i + "</span>" +
 									"<div style='width: 100%; height: 25px' id='core_progress_" + i + "'></div>" +

@@ -1,5 +1,4 @@
 .top-bar {
-	background-color: #01FF70 !important;
 	color: #001F3F !important;
 }
 
@@ -43,7 +42,7 @@
 	display: table-cell;
 	text-align: center;
 	width: 20px;
-	vertical-align:middle;
+	vertical-align:bottom;
 	padding: 1px;
 	font-size: 12px;
 	border: 1px solid #f6f6f6;
@@ -54,9 +53,10 @@
 .meter-value {
 	display: table-cell;
 	text-align: left;
+	padding-left: 10px !important;
 	width: 120px;
 	font-size: 12px;
-	vertical-align:middle;
+	vertical-align:bottom;
 	padding: 1px;
 	border: 1px solid #f6f6f6;
 	/*background-color: red;*/
