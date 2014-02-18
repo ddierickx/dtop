@@ -3,10 +3,9 @@
     <meta charset="utf-8" />
     <meta name="author" content="Dominique Dierickx">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dtop</title>
+    <title data-bind="text: title()">dtop</title>
     <link rel="stylesheet" href="css/foundation.css" />
     <link rel="stylesheet" type="text/css" href="css/htop.css"> 
-    <link rel="stylesheet" type="text/css" href="css/colors.min.css"> 
 	<script type="text/javascript" src="js/knockout-3.0.0.js"></script>
 	<script type="text/javascript" src="js/knockout.simplegrid.3.0.js"></script>
     <script src="js/modernizr.js"></script>
@@ -17,41 +16,140 @@
 	  <ul class="title-area">
 	    <li class="name">
 	      <h1><a href="#" data-bind="text: 'dtop@' + basicInfo().Hostname"></a></h1>
-	    </li>
+	    </li>	    
 	  </ul>
+
+	  <section class="top-bar-section">
+	  	<ul class="right">
+			<li class="has-form">
+			    <input id="txtFilter" type="text" data-bind="value: processFilter, valueUpdate: 'afterkeydown'" placeholder="Filter">
+			</li>
+	  	</ul>
+	  </section>
 	</nav>
 
     <div class="row">
+      <p></p>
+      <div class="large-6 columns">
+		<div id="cpu-meters" class="meter-container">
+		</div>
+      	<!--
+      	<div data-bind="foreach: cpu" class="meter-container">
+      		<div class="meter-row">
+      			<span class="meter-label" data-bind="text: $index"></span>
+				<div class="progress">
+					<div class="meter" data-bind="style: { width: Usage + '%' }"></div>
+				</div>
+				<span class="meter-value" data-bind="text: (Math.round(Usage*10)/10).toFixed(1) + '%'"></span>
+			</div>
+		</div>
+		-->
+
+		<div class="meter-container">
+			<span class="meter-label">m</span>
+			<div class="meter-row progress" style="font-size: 0em !important;">
+				<span class="meter memory-used" data-tooltip class="has-tip" style="display: inline-block" data-bind="style: { width: ( (memory_used() / memory().TotalKb) * 100 ) + '%' }, attr { title: 'Used: ' + (Math.floor(memory_used() / 1024)) + ' MB' }"></span>
+		    	<span class="meter memory-buffers" data-tooltip class="has-tip" style="display: inline-block" data-bind="style: { width: ( (memory().BuffersKb / memory().TotalKb) * 100) + '%' }, attr { title: 'Buffers: ' + (Math.floor(memory().BuffersKb / 1024)) + ' MB' }"></span>
+		   		<span class="meter memory-cache" data-tooltip class="has-tip" style="display: inline-block" data-bind="style: { width: ( (memory().CachedKb / memory().TotalKb) * 100) + '%' }, attr { title: 'Cached: ' + (Math.floor(memory().CachedKb / 1024)) + ' MB' }"></span>
+		   	</div>
+		   	<span class="meter-value" data-bind="text: Math.round(memory_used() / 1024) + '/' + Math.floor(memory().TotalKb/1024) + 'MB'"></span>
+		</div>
+
+		<div class="meter-container">
+			<span class="meter-label">s</span>
+			<div class="meter-row progress" style="font-size: 0px !important;">
+				<span class="meter" data-bind="style: { width: memory_swapped() / memory().SwapTotalKb + '%' }"></span>
+			</div>
+			<span class="meter-value" data-bind="text: Math.round(memory_swapped() / 1024) + '/' + Math.floor(memory().SwapTotalKb/1024) + 'MB'"></span>
+		</div>
+      </div>
+  	  <div class="large-6 columns">
+		<table class="system-info-table">
+		  <tbody>
+		    <tr>
+		      <td>Processes</td>
+		      <td>
+		      	<span data-bind="text: process_count"></span>
+		      </td>
+		    </tr>
+		    <tr>
+		      <td>Load avg</td>
+		      <td>
+		      		<span data-bind="text: loadAvg().Avg1, css: loadAvgColor1"></span>
+		      		<span data-bind="text: loadAvg().Avg5, css: loadAvgColor5"></span>
+		      		<span data-bind="text: loadAvg().Avg15, css: loadAvgColor15"></span>
+		      </td>
+		    </tr>
+		    <tr>
+		      <td>Uptime</td>
+		      <td><span data-bind="text: uptime_string"></span></td>
+		    </tr>
+		    <tr>
+		      <td>Users</td>
+		      <td><span data-tooltip class="has-tip" data-bind="text: users().All.length, attr { title: users_tooltip }"></span></td>
+		    </tr>			    
+		  </tbody>
+		</table>
+      </div>
     </div>
+
+    <div class="row">
+    	<div class="large-12 columns">
+    		<div data-bind="simpleGrid: processGridViewModel"></div>
+    	</div>
+    	<p></p>
+	</div>
 
     <script src="js/jquery.js"></script>
     <script src="js/jquery.sparkline.min.js"></script>
 
     <script src="js/foundation.min.js"></script>
     <script>
+      // string repeat
+	  String.prototype.repeat = function(num) { return new Array( num + 1 ).join( this ); }
+
+      // generic sortby object property.
+	  function sortBy(field, reverse, primer){
+		   var key = primer ? 
+		       function(x) {return primer(x[field])} : 
+		       function(x) {return x[field]};
+
+		   reverse = [-1, 1][+!!reverse];
+
+		   return function (a, b) {
+		       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+	     	}
+	  }
+
+	  // makes a digit string two digits!
+      function twoDigits(s) {
+      	return ("0" + s).slice(-2);
+      }
+
+      function getLoadAvgColor(vm, cpus, loadAvg) {
+        var perCpu = loadAvg / cpus;
+        			
+        if (perCpu < vm.LOADAVG_LIMIT_WARNING) {
+        	return "info-normal";
+        } else if (perCpu < vm.LOADAVG_LIMIT_ALERT) {
+        	return "info-warning";
+        } else {
+        	return "info-alert";
+        }
+      }
+
       $(document).ready(function () {
       	    $(document).foundation();
-
-	        /** This code runs when everything has been loaded on the page */
-	        /* Inline sparklines take their values from the contents of the tag */
-	        $('.inlinesparkline').sparkline(); 
-
-	        /* Sparklines can also take their values from the first argument 
-	        passed to the sparkline() function */
-	        var myvalues = [10,8,5,7,4,4,1];
-	        $('.dynamicsparkline').sparkline(myvalues);
-
-	        /* The second argument gives options such as chart type */
-	        $('.dynamicbar').sparkline(myvalues, {type: 'bar', barColor: 'green', width: '100%', height: '50px'} );
-
-	        /* Use 'html' instead of an array of values to pass options 
-	        to a sparkline with data in the tag */
-	        $('.inlinebar').sparkline('html', {type: 'bar', barColor: 'red'} );
 
       		var ViewModel = function() {
       			var self = this;
 
+      			/* consts */
+				self.LOADAVG_LIMIT_WARNING = 0.50
+				self.LOADAVG_LIMIT_ALERT = 0.70;
+
 				/* observables */
+				self.initialized = ko.observable(false);
       			self.processFilter = ko.observable("");
       			self.cpu = ko.observable({});
 				self.memory = ko.observable({});
@@ -61,7 +159,93 @@
 				self.loadAvg = ko.observable({});
 				self.basicInfo = ko.observable({});
 				self.process_count = ko.observable(0);
+
+				self.title = ko.computed(function() {
+					var cpus = self.cpu();
+					var usage = 0;
+					for (i = 0; i < cpus.length; i++) {
+						usage += cpus[i].Usage;
+					}
+
+					if (cpus.length > 0) {
+						var val = Math.ceil( ( (usage / cpus.length) ) / 20 );
+						return "■".repeat(val) + "□".repeat(5 - val);
+					} else {
+						return "dtop";
+					}
+				}, self);
+
+			    self.processGridViewModel = new ko.simpleGrid.viewModel({
+			        data: self.processes,
+			        columns: [
+			            { headerText: "Pid", rowText: "Pid" },
+			            { headerText: "User", rowText: "User" },
+			            { headerText: "Pri", rowText: "Pri" },
+			            { headerText: "Ni", rowText: "Ni" },
+			            { headerText: "Virt", rowText: "Virt" },
+			            { headerText: "Res", rowText: "Res" },
+			            { headerText: "Shr", rowText: "Shr" },
+			            { headerText: "S", rowText: "S" },
+			            { headerText: "Cpu", rowText: "Cpu" },
+			            { headerText: "Mem", rowText: "Mem" },
+			            { headerText: "Time", rowText: "Time" },
+			            { headerText: "Command", rowText: function(item) { return item.Command.length > 50 ? $.trim(item.Command).substring(0, 50) + '...' : item.Command } },
+			        ],
+			        pageSize: 10
+			    });
+
+				/* computed */
+				self.uptime_string = ko.computed(function() {
+        			var val = self.uptime();
+        			days = Math.floor(val / (60*60*24));
+        			remainder = (val % (days*60*60*24)) || val;
+        			hours = Math.floor(remainder / (60*60));
+        			remainder = (remainder % (hours*60*60)) || remainder;
+        			minutes = Math.floor(remainder / 60);
+        			remainder = (remainder % (minutes * 60)) || remainder;
+        			seconds = Math.floor(remainder);
+        			return days + " days, " + twoDigits(hours) + ":" + twoDigits(minutes) + ":" + twoDigits(seconds);
+        		}, self);
+        		self.memory_used = ko.computed(function () {
+        			var used = self.memory().TotalKb - self.memory().CachedKb - self.memory().BuffersKb - self.memory().FreeKb;
+        			return used;
+        		}, self);
+				self.memory_swapped = ko.computed(function() {
+        			return self.memory().SwapTotalKb - self.memory().SwapFreeKb;
+        		}, self);
+        		self.users_tooltip = ko.computed(function() {
+        			return $.map(self.users().All, function(obj, i) { return obj.Name; }).join(", ");
+        		}, self);
+        		self.loadAvgColor1 = ko.computed(function() { return getLoadAvgColor(self, self.cpu().length, self.loadAvg().Avg1); }, self);
+        		self.loadAvgColor5 = ko.computed(function() { return getLoadAvgColor(self, self.cpu().length, self.loadAvg().Avg5); }, self);
+        		self.loadAvgColor15 = ko.computed(function() { return getLoadAvgColor(self, self.cpu().length, self.loadAvg().Avg15); }, self);
+
+        		self.cpu.subscribe(function(cpus) {
+        			if (viewModel.initialized()) {
+						for (i = 0; i < cpus.length; i++) {
+							self.usages[i].push(Math.round(cpus[i].Usage));
+							$('#core_progress_' + i).sparkline(self.usages[i], { type: 'line', barColor: 'blue', width: '100%', height: '100%' } );
+							$('#core_value_' + i).text(Math.round(cpus[i].Usage) + "%");
+						}   				 	
+					}
+   				});
 			};
+
+			function initializeMeters(viewModel) {
+				var cpus = viewModel.cpu();
+				viewModel.usages = [];
+				cpu_view = $("#cpu-meters");
+
+				for (i = 0; i < cpus.length; i++) {
+					viewModel.usages[i] = [];
+					core_div = "<div id='core_row_" + i + "' class='meter-row'>" +
+									"<span id='core_label_" + i + "' class='meter-label'>" + i + "</span>" +
+									"<div style='width: 100%; height: 25px' id='core_progress_" + i + "'></div>" +
+									"<span id='core_value_" + i + "' class='meter-value'></span>" +
+							   "</div>";
+					$(cpu_view).append(core_div);
+				}
+			}
 
 			var viewModel = new ViewModel();
 
@@ -83,7 +267,7 @@
 										var processes = obj.V;
 										viewModel.process_count(processes.length);
 										// sort on cpu usage by default
-										//processes.sort(sortBy('Cpu', false));
+										processes.sort(sortBy('Cpu', false));
 										filtered = $.grep(processes, function(d, i) {
 											filter = viewModel.processFilter();
 											return d.Command.indexOf(filter) != -1;
@@ -105,12 +289,17 @@
 										break;
 									case "sys.basics":
 										viewModel.basicInfo(obj.V);
+										break;
 									case "sig.ready":
+										initializeMeters(viewModel);
+										viewModel.initialized(true);
 										$("body").fadeIn();
+										break;
 								}
 			};
 
 			ko.applyBindings(viewModel, document.getElementById("dtop"));
+			$("#txtFilter").focus();
 		});
     </script>
   </body>

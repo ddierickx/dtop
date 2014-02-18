@@ -10,7 +10,7 @@
 	<script type="text/javascript" src="js/knockout.simplegrid.3.0.js"></script>
     <script src="js/modernizr.js"></script>
   </head>
-  <body>
+  <body style="display: none">
     
 	<nav class="top-bar" data-topbar>
 	  <ul class="title-area">
@@ -278,6 +278,9 @@
 										break;
 									case "sys.basics":
 										viewModel.basicInfo(obj.V);
+										alert("ok");
+										$(document).fadeIn();
+										break;
 								}
 			};
 
