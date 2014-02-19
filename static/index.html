@@ -10,27 +10,16 @@
 	<script type="text/javascript" src="js/knockout.simplegrid.3.0.js"></script>
     <script src="js/modernizr.js"></script>
   </head>
-  <body style="display: none">
-    
-	<nav class="top-bar" data-topbar>
-	  <ul class="title-area">
-	    <li class="name">
-	      <h1><a href="#" data-bind="text: 'dtop@' + basicInfo().Hostname"></a></h1>
-	    </li>	    
-	  </ul>
-
-	  <section class="top-bar-section">
-	  	<ul class="right">
-			<li class="has-form">
-			    <input id="txtFilter" type="text" data-bind="value: processFilter, valueUpdate: 'afterkeydown'" placeholder="Filter">
-			</li>
-	  	</ul>
-	  </section>
-	</nav>
-
+  <body style="display: none">   
     <div class="row">
-      <p></p>
-      <div class="large-6 columns">
+	  <div class="large-6 columns">
+		<ul class="pricing-table">
+		  <li class="price"><span data-bind="text: basicInfo().Hostname"></span></li>
+		  <li class="description"><span data-bind="text: basicInfo().DistributionInfo"></li>
+		  <li class="bullet-item"><span data-bind="text: basicInfo().SystemInfo"></li>
+		  <li class="bullet-item"><span data-bind="text: uptime_string"></li>
+		</ul>
+
 		<div id="cpu-meters" class="meter-container">
 		</div>
 
@@ -50,34 +39,23 @@
 			</div>
 		</div>
       </div>
-  	  <div class="large-6 columns">
-		<table class="system-info-table">
-		  <tbody>
-		    <tr>
-		      <td>Processes</td>
-		      <td>
-		      	<span data-bind="text: process_count"></span>
-		      </td>
-		    </tr>
-		    <tr>
-		      <td>Load avg</td>
-		      <td>
-		      		<span data-bind="text: loadAvg().Avg1, css: loadAvgColor1"></span>
-		      		<span data-bind="text: loadAvg().Avg5, css: loadAvgColor5"></span>
-		      		<span data-bind="text: loadAvg().Avg15, css: loadAvgColor15"></span>
-		      </td>
-		    </tr>
-		    <tr>
-		      <td>Uptime</td>
-		      <td><span data-bind="text: uptime_string"></span></td>
-		    </tr>
-		    <tr>
-		      <td>Users</td>
-		      <td><span data-tooltip class="has-tip" data-bind="text: users().All.length, attr { title: users_tooltip }"></span></td>
-		    </tr>			    
-		  </tbody>
-		</table>
+      <div class="large-6 columns">
+      	<ul class="pricing-table">
+		  <li class="bullet-item">
+		  	<span data-bind="text: process_count() + ' processes'"></span>
+		  </li>
+		  <li class="bullet-item">
+		  		<span data-bind="text: loadAvg().Avg1, css: loadAvgColor1"></span>
+		      	<span data-bind="text: loadAvg().Avg5, css: loadAvgColor5"></span>
+		      	<span data-bind="text: loadAvg().Avg15, css: loadAvgColor15"></span>
+		  </li>
+		  <li class="bullet-item">
+		  	<span data-tooltip class="has-tip" data-bind="text: users().All.length + ' user(s)', attr { title: users_tooltip }"></span>
+		  </li>
+		</ul>
       </div>
+    </div>
+    <div class="row">
     </div>
     <p>&nbsp;</p>
     <div class="row">
@@ -213,7 +191,7 @@
 						for (i = 0; i < cpus.length; i++) {
 							self.cpu_usages[i].push(Math.round(cpus[i].Usage));
 							self.cpu_usages[i] = self.slice(self.cpu_usages[i]);
-							$('#core_progress_' + i).sparkline(self.cpu_usages[i], { type: 'line', lineColor: '#2ba6cb', width: '100%', height: '100%', chartRangeMin: 0, chartRangeMax: 100 } );
+							$('#core_progress_' + i).sparkline(self.cpu_usages[i], { type: 'line', tooltipSuffix:'%', lineColor: '#2ba6cb', width: '100%', height: '100%', chartRangeMin: 0, chartRangeMax: 100 } );
 							$('#core_value_' + i).text(Math.round(cpus[i].Usage) + "%");
 						}   				 	
 					}
@@ -229,10 +207,11 @@
    					self.memory_usage.Buffers = self.slice(self.memory_usage.Buffers);
    					self.memory_usage.Cached = self.slice(self.memory_usage.Cached);
    					self.memory_usage.Swapped = self.slice(self.memory_usage.Swapped);
-   					var options_used = { type: 'line', lineColor: '#43ac6a', fillColor: '#A0EDBC', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
-   					var options_buffers = { type: 'line', composite: true, lineColor: '#2ba6cb', fillColor: '#95D5E9', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
-   					var options_cached = { type: 'line', composite: true, lineColor: '#f08a24', fillColor: '#FFD3A7', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
-   					var options_swapped = { type: 'line', lineColor: '#FF8282', fillColor: '#FF8282', width: '100%', height: '20px', chartRangeMin: 0, chartRangeMax: 100 };
+   					var options_used = { type: 'line', tooltipSuffix:'% used', lineColor: '#43ac6a', fillColor: '#A0EDBC', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
+   					var options_buffers = { type: 'line', tooltipSuffix:'% buffers', composite: true, lineColor: '#2ba6cb', fillColor: '#95D5E9', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
+   					var options_cached = { type: 'line', tooltipSuffix:'% cached', composite: true, lineColor: '#f08a24', fillColor: '#FFD3A7', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
+   					
+   					var options_swapped = { type: 'line', tooltipSuffix:'% swapped', lineColor: '#FF8282', fillColor: '#FF8282', width: '100%', height: '20px', chartRangeMin: 0, chartRangeMax: 100 };
    					$("#memory-meter").sparkline( self.memory_usage.Used, options_used );
    					$("#memory-meter").sparkline( self.memory_usage.Cached, options_cached );
    					$("#memory-meter").sparkline( self.memory_usage.Buffers, options_buffers );
