@@ -13,7 +13,7 @@ import (
 )
 
 // Default delay for publisher data refresh
-const DELAY = 2 * time.Second
+const DELAY = 1 * time.Second
 
 // Function template for event publishers.
 type EventPublisher func(events chan Event)
@@ -141,7 +141,7 @@ func cpuinfo(events chan Event) {
                 }
             }
 
-            cpuUsages := make([]CpuUsage, 32) // len(currentUsage)
+            cpuUsages := make([]CpuUsage, len(currentUsage))
 
             for i, usage := range currentUsage {
                 cpuUsages[i] = NewCpuUsage(i, usage)

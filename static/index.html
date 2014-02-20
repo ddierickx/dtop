@@ -15,7 +15,7 @@
   	<p>&nbsp;</p>
   	<div class="container-fluid">
   		<div class="row">
-  			<div class="col-md-4">
+  			<div class="col-md-6">
 				<div class="panel panel-default">
 				  <div class="panel-heading">
 				    <h3 class="panel-title">System information</h3>
@@ -37,28 +37,30 @@
 				  </ul>
 				</div>
   			</div>
-  			<div class="col-md-4">
+  			<div class="col-md-6">
 				<div class="panel panel-default">
 				  <div class="panel-heading">
 				    <h3 class="panel-title">Overview</h3>
 				  </div>
 					<ul class="list-group">
 					  <li class="list-group-item">
-					  	<span class="label label-default pull-right" data-bind="text: uptime_string"></span>
+					  	<span class="label label-success pull-right" data-bind="text: uptime_string"></span>
 					    Uptime
 					  </li>
 					  <li class="list-group-item">
-					  	<span class="label label-default pull-right" data-bind="text: process_count()"></span>
+					  	<span class="label label-success pull-right" data-bind="text: process_count()"></span>
 					    Processes
 					  </li>
 					  <li class="list-group-item">
-					    <span class="label label-default pull-right" data-bind="text: users().All.length"></span>
+					    <span class="label label-success pull-right" data-bind="text: users().All.length"></span>
 					    <span data-bind="attr { title: users_tooltip }">Users</span>
 					  </li>
 					</ul>
 				 </div>
   			</div>
-  			<div class="col-md-4">
+  		</div>
+  		<div class="row">
+  			<div class="col-md-6">
 				<div class="panel panel-default">
 				  <div class="panel-heading">
 				    <h3 class="panel-title">Performance</h3>
@@ -83,19 +85,7 @@
 					</ul>
 				 </div>
   			</div>
-  		</div>
-
-    <div class="row">
-	  <div class="col-md-8">
-		<div class="panel panel-default">
-		  <div class="panel-heading">
-		    <h3 class="panel-title">Performance</h3>
-		  </div>
-			<div id="cpu-meters" class="list-group">
-			</div>
-		</div>
-      </div>
-	  <div class="col-md-4">
+	  		<div class="col-md-6">
 				<div class="panel panel-default">
 				  <div class="panel-heading">
 				    <h3 class="panel-title">Memory</h3>
@@ -107,31 +97,48 @@
 					  </li>
 					  <li class="list-group-item">
 					    <span class="label label-success pull-right" data-bind="text: Math.round(memory_used() / 1024) + ' MB'"></span>
-					    Used
-					  </li>
-					  <li class="list-group-item">
 					    <span class="label label-warning pull-right" data-bind="text: (Math.floor(memory().CachedKb / 1024)) + ' MB'"></span>
-					    Cached
-					  </li>
-					  <li class="list-group-item">
-					    <span class="label label-info pull-right" data-bind="text: (Math.floor(memory().BuffersKb / 1024)) + ' MB' "></span>
-					    Buffers
+						<span class="label label-info pull-right" data-bind="text: (Math.floor(memory().BuffersKb / 1024)) + ' MB' "></span>
+					    Used - Cached - Buffers
 					  </li>
 					  <li class="list-group-item meter-li">
 					    <span id="memory-meter"></span>
 					  </li>
 					</ul>
 				 </div>
+      		</div>
+  		</div>
+
+    <div class="row">
+	  <div class="col-md-12">
+		<div class="panel panel-default">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">CPU</h3>
+		  </div>
+			<div id="cpu-meters" class="list-group">
+			</div>
+		</div>
       </div>
     </div>
     <div class="row">
     </div>
     <p>&nbsp;</p>
+
     <div class="row">
-    	<div class="large-12 columns">
-    		<div data-bind="simpleGrid: processGridViewModel"></div>
-    	</div>
-    	<p></p>
+	  <div class="col-md-12">
+		<div class="panel panel-default">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">Processes</h3>
+		  </div>
+		  	<div class="list-group">
+			  	<div class="list-group-item">
+					<input type="text" class="form-control" id="txtFilter" placeholder="Filter" data-bind="value: processFilter, valueUpdate: 'afterkeydown'">
+					<div data-bind="simpleGrid: processGridViewModel"></div>
+				</div>
+			</div>
+		</div>
+      </div>
+    </div>
 	</div>
 
     <script src="js/jquery.js"></script>
@@ -223,16 +230,22 @@
 			        columns: [
 			            { headerText: "Pid", rowText: "Pid" },
 			            { headerText: "User", rowText: "User" },
-			            { headerText: "Pri", rowText: "Pri" },
-			            { headerText: "Ni", rowText: "Ni" },
-			            { headerText: "Virt", rowText: "Virt" },
-			            { headerText: "Res", rowText: "Res" },
-			            { headerText: "Shr", rowText: "Shr" },
-			            { headerText: "S", rowText: "S" },
 			            { headerText: "Cpu", rowText: "Cpu" },
 			            { headerText: "Mem", rowText: "Mem" },
 			            { headerText: "Time", rowText: "Time" },
-			            { headerText: "Command", rowText: function(item) { return item.Command.length > 50 ? $.trim(item.Command).substring(0, 50) + '...' : item.Command } },
+			            { headerText: "Command",
+			            	rowText:
+			            		function(item) {
+			            			return "<a href='javascript:void(0);' onclick=\"javascript:alert('" + item.Command + "');\">" + ( item.Command.length > 70 ? $.trim(item.Command).substring(0, 70) + '...' : item.Command  ) + "</a>";
+			            		}
+			            },
+			            /*{ 
+			            	headerText: "",
+			            	rowText:
+			            		function(item) {
+			            			return "<button type=\"button\" class=\"btn btn-primary\"> KILL </button>";
+			            		}
+			        	},*/
 			        ],
 			        pageSize: 10
 			    });
@@ -320,9 +333,6 @@
 				var cores_per_line = 4;
 				var cpus = viewModel.cpu();
 				var rows = Math.ceil(cpus.length / cores_per_line);
-				console.log("cpus " + cpus.length);
-				console.log("rows " + rows);
-				//				$(cpu_view).addClass("col-md-" + columns);
 
 				cpu_view = $("#cpu-meters");
 
@@ -337,9 +347,7 @@
 							break;
 						}
 
-						console.log("i " + i);
 						var w = 12 / Math.min( (cpus.length - ( r * cores_per_line )), cores_per_line);
-						console.log("w " + w);
 						viewModel.cpu_usages[i] = [];
 						core_div = "<div class='col-md-" + w + "' id='core_row_" + i + "'>" +
 										"<span class='pull-left label' id='core_progress_label_" + i + "'><span id='core_progress_value_" + i + "'></span></span>" +
