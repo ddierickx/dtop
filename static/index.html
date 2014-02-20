@@ -113,9 +113,9 @@
 					    Free
 					  </li>
 					  <li class="list-group-item">
-					    <span class="label label-success pull-right" data-bind="text: Math.round(memory_used() / 1024) + ' MB'"></span>
+					    <span class="label label-info pull-right" data-bind="text: (Math.floor(memory().BuffersKb / 1024)) + ' MB' "></span>
 					    <span class="label label-warning pull-right" data-bind="text: (Math.floor(memory().CachedKb / 1024)) + ' MB'"></span>
-						<span class="label label-info pull-right" data-bind="text: (Math.floor(memory().BuffersKb / 1024)) + ' MB' "></span>
+						<span class="label label-success pull-right" data-bind="text: Math.round(memory_used() / 1024) + ' MB'"></span>
 					    Used - Cached - Buffers
 					  </li>
 					  <li class="list-group-item meter-li">
