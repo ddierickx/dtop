@@ -8,8 +8,13 @@ body {
 }
 
 .panel-heading {
-	background-color: #001F3F !important;
-	color: white !important;
+	background-color: #f5f5f5 !important;
+	padding: 5px 10px !important;
+	color: #2ba6cb !important;
+}
+
+.panel-title {
+	font-size: 14px !important;
 }
 
 .bold {

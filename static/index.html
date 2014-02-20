@@ -12,7 +12,24 @@
     <script type="text/javascript" src="js/modernizr.js"></script>
   </head>
   <body style="display: none">   
-  	<p>&nbsp;</p>
+  
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">dtop</a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">System info</a></li>
+        <li><a href="#">CPU</a></li>
+        <li><a href="#">Processes</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="https://github.com/ddierickx/dtop" target="_blank">About</a></li>
+      </ul>
+    </div>
+</nav>
+
   	<div class="container-fluid">
   		<div class="row">
   			<div class="col-md-6">
@@ -128,7 +145,7 @@
 	  <div class="col-md-12">
 		<div class="panel panel-default">
 		  <div class="panel-heading">
-		    <h3 class="panel-title">Processes</h3>
+		    <h3 class="panel-title">Processes</h3><a href="#processes"></a>
 		  </div>
 		  	<div class="list-group">
 			  	<div class="list-group-item">
@@ -232,7 +249,6 @@
 			            { headerText: "User", rowText: "User" },
 			            { headerText: "Cpu", rowText: "Cpu" },
 			            { headerText: "Mem", rowText: "Mem" },
-			            { headerText: "Time", rowText: "Time" },
 			            { headerText: "Command",
 			            	rowText:
 			            		function(item) {
