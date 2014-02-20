@@ -109,7 +109,7 @@
 				  </div>
 					<ul class="list-group">
 					  <li class="list-group-item">
-					    <span class="label label-info pull-right" data-bind="text: (Math.floor(memory().TotalKb/1024)-Math.round(memory_used() / 1024)) + ' of ' + Math.floor(memory().TotalKb/1024) + 'MB'"></span>
+					    <span class="label  pull-right" data-bind="text: (Math.floor(memory().TotalKb/1024)-Math.round(memory_used() / 1024)) + ' of ' + Math.floor(memory().TotalKb/1024) + 'MB', css: memoryUsageColor"></span>
 					    Free
 					  </li>
 					  <li class="list-group-item">
