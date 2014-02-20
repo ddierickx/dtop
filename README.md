@@ -50,6 +50,8 @@ You can start, stop, status and restart the service as usual:
 
 ## features ##
 
+*   using Go so no runtime requirements needed after compilation
+*   only uses resources when the ui is accessed (and not a lot)
 *	cpu usage per core
 *   basic info: hostname, distro, kernel
 *	memory- and swap-usage (overall and per process)
