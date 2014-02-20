@@ -141,7 +141,7 @@ func cpuinfo(events chan Event) {
                 }
             }
 
-            cpuUsages := make([]CpuUsage, len(currentUsage))
+            cpuUsages := make([]CpuUsage, 32) // len(currentUsage)
 
             for i, usage := range currentUsage {
                 cpuUsages[i] = NewCpuUsage(i, usage)

@@ -1,14 +1,28 @@
-.top-bar {
-	color: #001F3F !important;
+body {
+	background: #FFFFFF;
 }
 
-.progress {
-	padding: 0px;
+.meter-li {
+	background-color: #EAE8E7 !important;
+	padding: 0px !important;
+}
+
+.panel-heading {
+	background-color: #001F3F !important;
+	color: white !important;
+}
+
+.bold {
+	font-weight: bold 
 }
 
 .system-info-table {
 	width: 100% !important;
 	border: 0px !important;
+}
+
+.label-info {
+	background-color: #39CCCC !important;
 }
 
 .process-command {
@@ -25,13 +39,25 @@
 	display: table-row;
 }
 
+.label-alert {
+	background-color: #f04124 !important;
+}
+
 .info-alert {
 	color: #f04124 !important;
 	font-weight: bold;
 }
 
+.label-warning {
+	background-color: #f08a24 !important;
+}
+
 .info-warning {
 	color: #f08a24 !important;
+}
+
+.label-normal {
+	background-color: #008cba !important;
 }
 
 .info-normal {

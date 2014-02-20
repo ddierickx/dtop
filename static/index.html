@@ -4,55 +4,124 @@
     <meta name="author" content="Dominique Dierickx">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-bind="text: title()">dtop</title>
-    <link rel="stylesheet" href="css/foundation.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="css/htop.css"> 
+
 	<script type="text/javascript" src="js/knockout-3.0.0.js"></script>
 	<script type="text/javascript" src="js/knockout.simplegrid.3.0.js"></script>
-    <script src="js/modernizr.js"></script>
+    <script type="text/javascript" src="js/modernizr.js"></script>
   </head>
   <body style="display: none">   
+  	<p>&nbsp;</p>
+  	<div class="container-fluid">
+  		<div class="row">
+  			<div class="col-md-4">
+				<div class="panel panel-default">
+				  <div class="panel-heading">
+				    <h3 class="panel-title">System information</h3>
+				  </div>
+				  <!-- List group -->
+				  <ul class="list-group">
+					  <li class="list-group-item">
+					  	<span class="label label-default pull-right" data-bind="text: basicInfo().Hostname"></span>
+					    Hostname
+					  </li>
+					  <li class="list-group-item">
+					  	<span class="label label-default pull-right" data-bind="text: basicInfo().DistributionInfo"></span>
+					    Distro
+					  </li>
+					  <li class="list-group-item">
+					    <span class="label label-default pull-right" data-bind="text: basicInfo().SystemInfo"></span>
+					    Kernel version
+					  </li>
+				  </ul>
+				</div>
+  			</div>
+  			<div class="col-md-4">
+				<div class="panel panel-default">
+				  <div class="panel-heading">
+				    <h3 class="panel-title">Overview</h3>
+				  </div>
+					<ul class="list-group">
+					  <li class="list-group-item">
+					  	<span class="label label-default pull-right" data-bind="text: uptime_string"></span>
+					    Uptime
+					  </li>
+					  <li class="list-group-item">
+					  	<span class="label label-default pull-right" data-bind="text: process_count()"></span>
+					    Processes
+					  </li>
+					  <li class="list-group-item">
+					    <span class="label label-default pull-right" data-bind="text: users().All.length"></span>
+					    <span data-bind="attr { title: users_tooltip }">Users</span>
+					  </li>
+					</ul>
+				 </div>
+  			</div>
+  			<div class="col-md-4">
+				<div class="panel panel-default">
+				  <div class="panel-heading">
+				    <h3 class="panel-title">Performance</h3>
+				  </div>
+					<ul class="list-group">
+					  <li class="list-group-item">
+					    <span class="label pull-right" data-bind="text: Math.floor(100*(memory_used() / memory().TotalKb)) + '%', css: memoryUsageColor"></span>
+					    Memory usage
+					  </li>
+					  <li class="list-group-item">
+					    <span class="label pull-right" data-bind="text: cpu_used() + '%', css: cpuUsageColor"></span>
+					    Cpu usage
+					  </li>
+					  <li class="list-group-item">
+					    <span class="pull-right">
+					  		<span data-bind="text: loadAvg().Avg1, css: loadAvgColor1"></span>
+					      	<span data-bind="text: loadAvg().Avg5, css: loadAvgColor5"></span>
+					      	<span data-bind="text: loadAvg().Avg15, css: loadAvgColor15"></span>
+					    </span>
+					    Load Average
+					  </li>
+					</ul>
+				 </div>
+  			</div>
+  		</div>
+
     <div class="row">
-	  <div class="large-6 columns">
-		<ul class="pricing-table">
-		  <li class="price"><span data-bind="text: basicInfo().Hostname"></span></li>
-		  <li class="description"><span data-bind="text: basicInfo().DistributionInfo"></li>
-		  <li class="bullet-item"><span data-bind="text: basicInfo().SystemInfo"></li>
-		  <li class="bullet-item"><span data-bind="text: uptime_string"></li>
-		</ul>
-
-		<div id="cpu-meters" class="meter-container">
-		</div>
-
-		<div class="meter-container">
-			<div class="meter-row">
-				<span class="meter-label">m</span>
-				<div id="memory-meter"></div>
-			   	<span class="meter-value" data-bind="text: Math.round(memory_used() / 1024) + '/' + Math.floor(memory().TotalKb/1024) + 'MB'"></span>
-            </div>
-		</div>
-
-		<div class="meter-container">
-			<div class="meter-row" style="font-size: 0px !important;">
-				<span class="meter-label">s</span>
-				<div id="swapped-meter"></div>
-			   	<span class="meter-value" data-bind="text: Math.round(memory_swapped() / 1024) + '/' + Math.floor(memory().SwapTotalKb/1024) + 'MB'"></span>
+	  <div class="col-md-8">
+		<div class="panel panel-default">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">Performance</h3>
+		  </div>
+			<div id="cpu-meters" class="list-group">
 			</div>
 		</div>
       </div>
-      <div class="large-6 columns">
-      	<ul class="pricing-table">
-		  <li class="bullet-item">
-		  	<span data-bind="text: process_count() + ' processes'"></span>
-		  </li>
-		  <li class="bullet-item">
-		  		<span data-bind="text: loadAvg().Avg1, css: loadAvgColor1"></span>
-		      	<span data-bind="text: loadAvg().Avg5, css: loadAvgColor5"></span>
-		      	<span data-bind="text: loadAvg().Avg15, css: loadAvgColor15"></span>
-		  </li>
-		  <li class="bullet-item">
-		  	<span data-tooltip class="has-tip" data-bind="text: users().All.length + ' user(s)', attr { title: users_tooltip }"></span>
-		  </li>
-		</ul>
+	  <div class="col-md-4">
+				<div class="panel panel-default">
+				  <div class="panel-heading">
+				    <h3 class="panel-title">Memory</h3>
+				  </div>
+					<ul class="list-group">
+					  <li class="list-group-item">
+					    <span class="label label-info pull-right" data-bind="text: (Math.floor(memory().TotalKb/1024)-Math.round(memory_used() / 1024)) + ' of ' + Math.floor(memory().TotalKb/1024) + 'MB'"></span>
+					    Free
+					  </li>
+					  <li class="list-group-item">
+					    <span class="label label-success pull-right" data-bind="text: Math.round(memory_used() / 1024) + ' MB'"></span>
+					    Used
+					  </li>
+					  <li class="list-group-item">
+					    <span class="label label-warning pull-right" data-bind="text: (Math.floor(memory().CachedKb / 1024)) + ' MB'"></span>
+					    Cached
+					  </li>
+					  <li class="list-group-item">
+					    <span class="label label-info pull-right" data-bind="text: (Math.floor(memory().BuffersKb / 1024)) + ' MB' "></span>
+					    Buffers
+					  </li>
+					  <li class="list-group-item meter-li">
+					    <span id="memory-meter"></span>
+					  </li>
+					</ul>
+				 </div>
       </div>
     </div>
     <div class="row">
@@ -68,7 +137,7 @@
     <script src="js/jquery.js"></script>
     <script src="js/jquery.sparkline.min.js"></script>
 
-    <script src="js/foundation.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
     <script>
       // string repeat
 	  String.prototype.repeat = function(num) { return new Array( num + 1 ).join( this ); }
@@ -103,9 +172,17 @@
         }
       }
 
-      $(document).ready(function () {
-      	    $(document).foundation();
+      function getPerformanceColor(vm, metric) {
+        if (metric < 70) {
+        	return "label-success";
+        } else if (metric < 90) {
+        	return "label-warning";
+        } else {
+        	return "label-danger";
+        }
+      }
 
+      $(document).ready(function () {
       		var ViewModel = function() {
       			var self = this;
 
@@ -172,6 +249,14 @@
         			seconds = Math.floor(remainder);
         			return days + " days, " + twoDigits(hours) + ":" + twoDigits(minutes) + ":" + twoDigits(seconds);
         		}, self);
+        		self.cpu_used = ko.computed(function () {
+        			var used = 0;
+        			var cpus = self.cpu();
+        			for (i = 0; i < cpus.length; i++) {
+						used += Math.round(cpus[i].Usage);
+					}
+					return Math.floor(used / cpus.length);
+        		}, self);
         		self.memory_used = ko.computed(function () {
         			var used = self.memory().TotalKb - self.memory().CachedKb - self.memory().BuffersKb - self.memory().FreeKb;
         			return used;
@@ -186,13 +271,21 @@
         		self.loadAvgColor5 = ko.computed(function() { return getLoadAvgColor(self, self.cpu().length, self.loadAvg().Avg5); }, self);
         		self.loadAvgColor15 = ko.computed(function() { return getLoadAvgColor(self, self.cpu().length, self.loadAvg().Avg15); }, self);
 
+        		self.cpuUsageColor = ko.computed(function() { return getPerformanceColor(self, self.cpu_used()); }, self);
+        		self.memoryUsageColor = ko.computed(function() { return getPerformanceColor(self, Math.floor(100*(self.memory_used() / self.memory().TotalKb))); }, self);
+
         		self.cpu.subscribe(function(cpus) {
         			if (viewModel.initialized()) {
 						for (i = 0; i < cpus.length; i++) {
 							self.cpu_usages[i].push(Math.round(cpus[i].Usage));
 							self.cpu_usages[i] = self.slice(self.cpu_usages[i]);
-							$('#core_progress_' + i).sparkline(self.cpu_usages[i], { type: 'line', tooltipSuffix:'%', lineColor: '#2ba6cb', width: '100%', height: '100%', chartRangeMin: 0, chartRangeMax: 100 } );
-							$('#core_value_' + i).text(Math.round(cpus[i].Usage) + "%");
+							$('#core_progress_' + i).sparkline(self.cpu_usages[i], { type: 'line', tooltipSuffix:'%', lineColor: '#2ba6cb', width: '100%', height: '34px', chartRangeMin: 0, chartRangeMax: 100 } );
+							$('#core_progress_label_' + i).removeClass("label-info");
+							$('#core_progress_label_' + i).removeClass("label-danger");
+							$('#core_progress_label_' + i).removeClass("label-warning");
+							$('#core_progress_label_' + i).addClass(getPerformanceColor(self, cpus[i].Usage));
+							//$('#core_progress_value_' + i).addClass(getPerformanceColor(cpus[i].Usage));
+							$('#core_progress_value_' + i).text(Math.round(cpus[i].Usage) + "%");
 						}   				 	
 					}
    				});
@@ -210,28 +303,52 @@
    					var options_used = { type: 'line', tooltipSuffix:'% used', lineColor: '#43ac6a', fillColor: '#A0EDBC', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
    					var options_buffers = { type: 'line', tooltipSuffix:'% buffers', composite: true, lineColor: '#2ba6cb', fillColor: '#95D5E9', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
    					var options_cached = { type: 'line', tooltipSuffix:'% cached', composite: true, lineColor: '#f08a24', fillColor: '#FFD3A7', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
+   					var options_swapped = { type: 'line', tooltipSuffix:'% cached', composite: true, lineColor: '#ff0000', fillColor: '#FFA5A5', width: '100%', height: '40px', chartRangeMin: 0, chartRangeMax: 100 };
    					
-   					var options_swapped = { type: 'line', tooltipSuffix:'% swapped', lineColor: '#FF8282', fillColor: '#FF8282', width: '100%', height: '20px', chartRangeMin: 0, chartRangeMax: 100 };
+   					//var options_swapped = { type: 'line', tooltipSuffix:'% swapped', lineColor: '#FF8282', fillColor: '#FF8282', width: '50px', height: 'auto', chartRangeMin: 0, chartRangeMax: 100 };
    					$("#memory-meter").sparkline( self.memory_usage.Used, options_used );
    					$("#memory-meter").sparkline( self.memory_usage.Cached, options_cached );
    					$("#memory-meter").sparkline( self.memory_usage.Buffers, options_buffers );
-   					$("#swapped-meter").sparkline( self.memory_usage.Swapped, options_swapped );
+   					//$("#memory-meter").sparkline( self.memory_usage.Swapped, options_swapped );
+   					//$("#swapped-meter").sparkline( self.memory_usage.Swapped, options_swapped );
 				});
 			};
 
 			function initializeMeters(viewModel) {
-				var cpus = viewModel.cpu();
 				viewModel.cpu_usages = [];
+
+				var cores_per_line = 4;
+				var cpus = viewModel.cpu();
+				var rows = Math.ceil(cpus.length / cores_per_line);
+				console.log("cpus " + cpus.length);
+				console.log("rows " + rows);
+				//				$(cpu_view).addClass("col-md-" + columns);
+
 				cpu_view = $("#cpu-meters");
 
-				for (i = 0; i < cpus.length; i++) {
-					viewModel.cpu_usages[i] = [];
-					core_div = "<div id='core_row_" + i + "' class='meter-row'>" +
-									"<span id='core_label_" + i + "' class='meter-label'>" + i + "</span>" +
-									"<div style='width: 100%; height: 25px' id='core_progress_" + i + "'></div>" +
-									"<span id='core_value_" + i + "' class='meter-value'></span>" +
-							   "</div>";
-					$(cpu_view).append(core_div);
+
+				for (r = 0; r < rows; r++) {
+					var cpu_row = $("<div class='row'></div>");
+
+					for (c = 0; c < cores_per_line; c++) {
+						var i = ( r * cores_per_line ) + c;
+
+						if (i >= cpus.length) {
+							break;
+						}
+
+						console.log("i " + i);
+						var w = 12 / Math.min( (cpus.length - ( r * cores_per_line )), cores_per_line);
+						console.log("w " + w);
+						viewModel.cpu_usages[i] = [];
+						core_div = "<div class='col-md-" + w + "' id='core_row_" + i + "'>" +
+										"<span class='pull-left label' id='core_progress_label_" + i + "'><span id='core_progress_value_" + i + "'></span></span>" +
+										"<span id='core_progress_" + i + "'></span>" +
+								   "</div>";
+						$(cpu_row).append($(core_div));
+					}
+					
+					$(cpu_view).append(cpu_row);
 				}
 			}
 
@@ -291,4 +408,4 @@
 		});
     </script>
   </body>
-</html>
+</html
