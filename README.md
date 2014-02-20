@@ -32,6 +32,8 @@ Run dtop.
 
 Then point your webbrowser at http://localhost:12345 and you should see (screenshot may not be up to date):
 
+The port can be change by passing the '--port X' parameter to dtop.
+
 ![Image](/screenshot.png?raw=true)
 
 ### run as a daemon
@@ -48,22 +50,24 @@ You can start, stop, status and restart the service as usual:
 
 ## features ##
 
-*	cpu
+*	cpu usage per core
+*   basic info: hostname, distro, kernel
 *	memory- and swap-usage (overall and per process)
 *	uptime
 *	load avg
 *	users
 *	basic search functionality
 *   cpu usage summary in page title
+*   mobile / tablet compatible ui
 
 ## todo ##
 
+*   provide pre-compiled binaries or packages (rpm/deb)
 *   make (install) script based on install-dtopd.sh
-*   use a sparkline instead of a bar chart for cpu/mem usage
+*   re-add swap usage
 *	user defined sorting iso. cpu percentage
 *   a nice favicon/logo
 *	processtree
-*	hint full command text on mouseover
 *	basic (?) authentication
 *	process kill feature
 *	htop like keyboard shortcuts
