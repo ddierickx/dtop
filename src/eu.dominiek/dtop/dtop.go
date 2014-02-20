@@ -26,7 +26,7 @@ func main() {
     
     // start publishers as parallel.
     for _, eventPublisher := range eventPublishers {   
-        go eventPublisher(events)
+        go FailSafe(eventPublisher)(events)
     }
 
     eventServer := NewEventServer(events, jsonEventSerializer)

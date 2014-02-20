@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "time"
+    "log"
     "errors"
     "io/ioutil"
     "strings"
@@ -17,6 +18,19 @@ const DELAY = 1 * time.Second
 
 // Function template for event publishers.
 type EventPublisher func(events chan Event)
+
+func FailSafe(eventPublisher func(events chan Event)) EventPublisher {
+    f := func(events chan Event) {
+        defer func() {
+            if r := recover(); r != nil {
+                log.Printf("Recovered from EventPublisher failure: %s", r)
+                time.Sleep(DELAY)
+            }
+        }()
+        eventPublisher(events)
+    }
+    return f
+}
 
 // Process info publisher function which parses `ps` output into a ProcessInfo array and broadcasts it on the event channel.
 func processinfo(events chan Event) {
