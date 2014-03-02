@@ -215,7 +215,7 @@
       			self.slice = function(ar) { return ar.slice(Math.max(ar.length - 100, 0), ar.length) };
 				self.LOADAVG_LIMIT_WARNING = 0.50
 				self.LOADAVG_LIMIT_ALERT = 0.70;
-
+				self.PS_COMMAND_LENGTH=100;
 				/* observables */
 				self.initialized = ko.observable(false);
       			self.processFilter = ko.observable("");
@@ -238,7 +238,7 @@
 			            { headerText: "Command",
 			            	rowText:
 			            		function(item) {
-			            			return "<a href='javascript:void(0);' onclick=\"javascript:alert('" + item.Command + "');\">" + ( item.Command.length > 70 ? $.trim(item.Command).substring(0, 70) + '...' : item.Command  ) + "</a>";
+			            			return "<a href='javascript:void(0);' onclick=\"javascript:alert('" + item.Command + "');\">" + ( item.Command.length > self.PS_COMMAND_LENGTH ? $.trim(item.Command).substring(0, self.PS_COMMAND_LENGTH) + '...' : item.Command  ) + "</a>";
 			            		}
 			            },
 			            /*{ 
