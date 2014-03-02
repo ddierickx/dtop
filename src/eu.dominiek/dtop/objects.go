@@ -12,6 +12,16 @@ type BasicInfo struct {
 	DistributionInfo string
 }
 
+type DiskInfo struct {
+	Name         string
+	Type       string
+	Size string
+	Used string
+	Available string
+	UsedPct string
+	MountPoint string
+}
+
 type CpuUsage struct {
 	CpuId int
 	Usage float64
@@ -125,4 +135,16 @@ func NewProcessInfo(pid int, user string, pri int, ni int, virt int, res int, sh
 	processInfo.Time = time
 	processInfo.Command = command
 	return *processInfo
+}
+
+func NewDiskInfo(name string, diskType string, size string, used string, available string, usedPct string, mountPoint string) DiskInfo {
+	diskInfo := new(DiskInfo)
+	diskInfo.Name = name
+	diskInfo.Type = diskType
+	diskInfo.Size = size
+	diskInfo.Used = used
+	diskInfo.Available = available
+	diskInfo.UsedPct = usedPct
+	diskInfo.MountPoint = mountPoint
+	return *diskInfo
 }

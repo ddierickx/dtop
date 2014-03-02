@@ -232,6 +232,29 @@ func users(events chan Event) {
 	}
 }
 
+// Run 'df' command and parse output to get disk usage statistics.
+func diskfree(events chan Event) {
+	for {
+		output, err := capture_stdout("df", "-Tlh")
+
+		if err != nil {
+			panic(fmt.Sprintf("error obtaining disk free: %s", err))
+		}
+
+		var all []DiskInfo
+
+		for _, line := range output {
+			columns := strings.Split(line, " ")
+			diskInfo := NewDiskInfo()
+			all = append(all, diskInfo)
+		}
+
+		events <- NewEvent("sys.du", all)
+
+		time.Sleep(DELAY)
+	}
+}
+
 // Parse '/proc/loadavg' to get system load averages.
 func loadavg(events chan Event) {
 	for {
