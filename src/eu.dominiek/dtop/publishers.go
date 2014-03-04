@@ -236,12 +236,10 @@ func users(events chan Event) {
 func disk(events chan Event) {
 	for {
 		output, err := capture_stdout("df", "-Tlh")
-		// skip header
-		output = output[1:]
 		// replace separator (todo: this will fail if a field value contains spaces...)
 		spaces := regexp.MustCompile("[\\ ]+")
 
-		if err != nil {
+		if err != nil && output == nil {
 			panic(fmt.Sprintf("error obtaining disk free: %s", err))
 		}
 
@@ -353,7 +351,7 @@ func capture_stdout(cmd string, args string) ([]string, error) {
 	}
 
 	if err := command.Wait(); err != nil {
-		return nil, errors.New(fmt.Sprintf("Error running command '%s': %s", cmd, err))
+		return strings.Split(output, "\n"), errors.New(fmt.Sprintf("Error running command '%s': %s", cmd, err))
 	}
 
 	return strings.Split(output, "\n"), nil
