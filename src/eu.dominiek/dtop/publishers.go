@@ -251,7 +251,7 @@ func disk(events chan Event) {
 			line = spaces.ReplaceAllString(line, "|")
 			columns := strings.Split(line, "|")
 
-			if len(columns) == 7 {
+			if len(columns) == 7 && !strings.HasPrefix(strings.ToLower(line), "filesystem") {
 				name := columns[0]
 				diskType := columns[1]
 				size := columns[2]
