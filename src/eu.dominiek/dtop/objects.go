@@ -13,12 +13,12 @@ type BasicInfo struct {
 }
 
 type DiskInfo struct {
-	Name         string
+	Name       string
 	Type       string
-	Size string
-	Used string
-	Available string
-	UsedPct string
+	Size       string
+	Used       string
+	Available  string
+	UsedPct    string
 	MountPoint string
 }
 

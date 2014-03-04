@@ -233,9 +233,13 @@ func users(events chan Event) {
 }
 
 // Run 'df' command and parse output to get disk usage statistics.
-func diskfree(events chan Event) {
+func disk(events chan Event) {
 	for {
 		output, err := capture_stdout("df", "-Tlh")
+		// skip header
+		output = output[1:]
+		// replace separator (todo: this will fail if a field value contains spaces...)
+		spaces := regexp.MustCompile("[\\ ]+")
 
 		if err != nil {
 			panic(fmt.Sprintf("error obtaining disk free: %s", err))
@@ -244,12 +248,24 @@ func diskfree(events chan Event) {
 		var all []DiskInfo
 
 		for _, line := range output {
-			columns := strings.Split(line, " ")
-			diskInfo := NewDiskInfo()
-			all = append(all, diskInfo)
+			line = spaces.ReplaceAllString(line, "|")
+			columns := strings.Split(line, "|")
+
+			if len(columns) == 7 {
+				name := columns[0]
+				diskType := columns[1]
+				size := columns[2]
+				used := columns[3]
+				available := columns[4]
+				usedPct := columns[5]
+				mountPoint := columns[6]
+
+				diskInfo := NewDiskInfo(name, diskType, size, used, available, usedPct, mountPoint)
+				all = append(all, diskInfo)
+			}
 		}
 
-		events <- NewEvent("sys.du", all)
+		events <- NewEvent("sys.disk", all)
 
 		time.Sleep(DELAY)
 	}

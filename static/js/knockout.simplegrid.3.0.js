@@ -15,6 +15,7 @@
         // Defines a view model class you can use to populate a grid
         viewModel: function (configuration) {
             this.data = configuration.data;
+            this.hidePagination = configuration.hidePagination;
             this.currentPageIndex = ko.observable(0);
             this.pageSize = configuration.pageSize || 5;
 
@@ -69,7 +70,6 @@
         // This method is called to initialize the node, and will also be called again if you change what the grid is bound to
         update: function (element, viewModelAccessor, allBindings) {
             var viewModel = viewModelAccessor();
-
             // Empty the element
             while(element.firstChild)
                 ko.removeNode(element.firstChild);
@@ -82,9 +82,11 @@
             var gridContainer = element.appendChild(document.createElement("DIV"));
             ko.renderTemplate(gridTemplateName, viewModel, { templateEngine: templateEngine }, gridContainer, "replaceNode");
 
-            // Render the page links
-            var pageLinksContainer = element.appendChild(document.createElement("DIV"));
-            ko.renderTemplate(pageLinksTemplateName, viewModel, { templateEngine: templateEngine }, pageLinksContainer, "replaceNode");
+            if (!viewModel.hidePagination) {
+                // Render the page links
+                var pageLinksContainer = element.appendChild(document.createElement("DIV"));
+                ko.renderTemplate(pageLinksTemplateName, viewModel, { templateEngine: templateEngine }, pageLinksContainer, "replaceNode");
+            }
         }
     };
 })();

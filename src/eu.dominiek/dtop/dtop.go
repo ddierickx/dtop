@@ -22,7 +22,7 @@ func main() {
 	events := make(chan Event)
 
 	// registered publishers
-	eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo, basicinfo}
+	eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo, basicinfo, disk}
 
 	// start publishers as parallel.
 	for _, eventPublisher := range eventPublishers {

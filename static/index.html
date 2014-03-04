@@ -23,6 +23,7 @@
         <li><a href="#systeminfo">System info</a></li>
         <li><a href="#cpu">CPU</a></li>
         <li><a href="#processes">Processes</a></li>
+        <li><a href="#diskusage">Disks</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="https://github.com/ddierickx/dtop" target="_blank">About</a></li>
@@ -127,12 +128,22 @@
   		</div>
 
     <div class="row">
-	  <div class="col-md-12">
+	  <div class="col-md-6">
 		<div class="panel panel-default">
 		  <div class="panel-heading">
 		    <h3 class="panel-title">CPU</h3><a name="cpu"></a>
 		  </div>
 			<div id="cpu-meters" class="list-group">
+			</div>
+		</div>
+      </div>
+	  <div class="col-md-6">
+		<div class="panel panel-default">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">Disk usage</h3><a name="diskusage"></a>
+		  </div>
+			<div id="disk-meters" class="list-group">
+				<div data-bind="simpleGrid: diskUsageGridViewModel"></div>
 			</div>
 		</div>
       </div>
@@ -222,6 +233,7 @@
       			self.cpu = ko.observable({});
 				self.memory = ko.observable({});
 				self.processes = ko.observableArray([]);
+				self.diskInfo = ko.observableArray([]);
 				self.users = ko.observable({ All: [] });
 				self.uptime = ko.observable({});
 				self.loadAvg = ko.observable({});
@@ -251,6 +263,29 @@
 			        ],
 			        pageSize: 10
 			    });
+
+			    self.diskUsageGridViewModel = new ko.simpleGrid.viewModel({
+			        data: self.diskInfo,
+			        hidePagination: true,
+			        columns: [
+			            { headerText: "Disk", rowText: "Name" },
+			            { headerText: "Mount", rowText: "MountPoint" },
+			            { headerText: "Type", rowText: "Type" },
+			            { headerText: "Size", rowText: "Size" },
+			            { headerText: "Used", rowText: "Used" },
+			            { headerText: "Free", rowText: "Available" },
+			            { headerText: "Used", rowText: function(item) {  return "<span class='label " + getPerformanceColor(self, item.UsedPct.replace("%", "")) + "'>" + item.UsedPct + "</span>"; } },
+			            /*{ 
+			            	headerText: "",
+			            	rowText:
+			            		function(item) {
+			            			return "<button type=\"button\" class=\"btn btn-primary\"> KILL </button>";
+			            		}
+			        	},*/
+			        ],
+			        pageSize: 10
+			    });
+
 
 				/* computed */
 				self.uptime_string = ko.computed(function() {
@@ -332,7 +367,7 @@
 			function initializeMeters(viewModel) {
 				viewModel.cpu_usages = [];
 
-				var cores_per_line = 4;
+				var cores_per_line = 2;
 				var cpus = viewModel.cpu();
 				var rows = Math.ceil(cpus.length / cores_per_line);
 
@@ -404,6 +439,11 @@
 										break;
 									case "sys.basics":
 										viewModel.basicInfo(obj.V);
+										break;
+									case "sys.disk":
+										var diskInfo = obj.V;
+										diskInfo.sort(sortBy('Name', true));
+										viewModel.diskInfo(obj.V);
 										break;
 									case "sig.ready":
 										initializeMeters(viewModel);
