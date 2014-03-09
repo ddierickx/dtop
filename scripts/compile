@@ -1,0 +1,8 @@
+#!/bin/bash
+export GOOS=$1
+export GOARCH=$2
+export OUTPUT=$3
+cd ${GOROOT}/src/
+source make.bash
+cd -
+${GOROOT}/bin/go build -o ${OUTPUT} eu.dominiek/dtop
