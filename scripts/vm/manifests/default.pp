@@ -12,6 +12,10 @@ exec { "unpack-go":
 	path => [ "/usr/bin/", "/bin/" ]
 }
 ->
+package { "rpm":
+    ensure   => "installed",
+}
+->
 package { "fpm":
     ensure   => "1.0.2",
     provider => "gem",
@@ -20,7 +24,7 @@ package { "fpm":
 exec {  "make-distros":
 	command => "make dist-all",
 	cwd => "/dtop-dist",
-	creates => [ "/dtop-dist/dist/dtop-0.1.bin.arm5.tar.gz",
-				 "/dtop-dist/dist/dtop-0.1.bin.x64.tar.gz" ],
-	path => [ "/usr/bin/", "/bin/" ]	
+	creates => [ "/dtop-dist/dist/dtop_0.1-linux-amd64.deb",
+				 "/dtop-dist/dist/dtop_0.1-linux-amd64.rpm" ],
+	path => [ "/usr/bin/", "/usr/local/bin/", "/bin/" ]	
 }

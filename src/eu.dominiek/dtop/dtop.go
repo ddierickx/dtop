@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"code.google.com/p/go.net/websocket"
 	"encoding/json"
 	"flag"
@@ -36,7 +37,16 @@ func main() {
 	go eventServer.monitor()
 
 	// register http handlers
-	http.Handle("/", http.FileServer(http.Dir("./static")))
+	path := "/usr/local/share/dtop/static"
+	if _, err := os.Stat("./static"); err == nil {
+		path = "./static"
+	} else {
+		if _, err := os.Stat(path); err != nil {
+			panic("Web interface source files were not found at: " + path)
+		}
+	}
+
+	http.Handle("/", http.FileServer(http.Dir(path)))
 	http.Handle("/events", websocket.Handler(eventServer.handler))
 
 	log.Printf("starting server at http://127.0.0.1:%d", *port)

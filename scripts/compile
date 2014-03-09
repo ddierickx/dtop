@@ -1,7 +1,9 @@
 #!/bin/bash
-export GOOS=$1
-export GOARCH=$2
-export OUTPUT=$3
+export GOROOT=$1
+export GOPATH=$2
+export GOOS=$3
+export GOARCH=$4
+export OUTPUT=$5
 cd ${GOROOT}/src/
 source make.bash
 cd -

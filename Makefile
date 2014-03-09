@@ -14,33 +14,29 @@ $(info GOPATH=$(GOPATH))
 
 GO := $(GOROOT)/bin/go
 
-build-all : build-linux-x64 build-linux-386 build-linux-arm5 build-darwin-386 build-darwin-x64
-dist-all : build-all dist-linux-deb-x64
+build-all : build-linux-amd64
+dist-all : build-all dist-linux-deb-amd64 dist-linux-rpm-amd64
 
-build-linux-arm5 :
-	$(info Building for linux arm5)
-	GOROOT=$(GOROOT) ; GOPATH=$(GOPATH) ; GOARM=5 ; scripts/compile linux arm bin/linux-arm5/dtop
+build-linux-amd64 :
+	$(info Building for linux amd64)
+	scripts/compile $(GOROOT) $(GOPATH) linux amd64 bin/linux-amd64/dtop
 
-build-linux-386 :
-	$(info Building for linux x86)
-	GOROOT=$(GOROOT) ; GOPATH=$(GOPATH) ; scripts/compile linux 386 bin/linux-x86/dtop
-
-build-linux-x64 :
-	$(info Building for linux x64)
-	GOROOT=$(GOROOT) ; GOPATH=$(GOPATH) ; scripts/compile linux amd64 bin/linux-x64/dtop
-
-build-darwin-386 :
-	$(info Building for darwin 386)
-	GOROOT=$(GOROOT) ; GOPATH=$(GOPATH) ; scripts/compile darwin 386 bin/darwin-386/dtop
-
-build-darwin-x64 :
-	$(info Building for darwin x64)
-	GOROOT=$(GOROOT) ; GOPATH=$(GOPATH) ; scripts/compile darwin amd64 bin/darwin-x64/dtop
-
-dist-linux-deb-x64 :
-	$(info Packaging linux x64 deb distribution)
+dist-linux-deb-amd64 :
+	$(info Packaging linux amd64 deb distribution)
+	cp bin/linux-amd64/dtop /usr/bin/ -f
+	mkdir -p /usr/local/share/dtop
+	cp static /usr/local/share/dtop -rf
 	mkdir -p dist
-	#tar cf dist/dtop-$(VERSION).linux.x64.tar.gz README.md scripts/install.sh static bin/x64/dtop
+	fpm --provides dtop -s dir -t deb -n dtop -v $(VERSION) -p dist/dtop_VERSION-linux-ARCH.deb /usr/bin/dtop /usr/local/share/dtop/static
+
+dist-linux-rpm-amd64 :
+	$(info Packaging linux amd64 rpm distribution)
+	cp bin/linux-amd64/dtop /usr/bin/ -f
+	mkdir -p /usr/local/share/dtop
+	cp static /usr/local/share/dtop -rf
+	mkdir -p dist
+	fpm --provides dtop -s dir -t rpm -n dtop -v $(VERSION) -p dist/dtop_VERSION-linux-ARCH.rpm /usr/bin/dtop /usr/local/share/dtop/static
+
 
 format :
 	$(info Formatting sources)
