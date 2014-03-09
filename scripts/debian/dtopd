@@ -16,8 +16,8 @@
 NAME=dtopd
 PIDFILE=/var/run/$NAME.pid
 #This is the command to be run, give the full pathname
-DAEMON_ROOT=/opt/dtop
-DAEMON=/opt/dtop/dtop
+DAEMON_ROOT=/usr/local/share/dtop
+DAEMON=/usr/bin/dtop
 DAEMON_OPTS="--port 12345"
 SS="start-stop-daemon"
 

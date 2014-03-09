@@ -1,3 +1,4 @@
-scripts/vm/.vagrant
+scripts/vm-centos/.vagrant
+scripts/vm-packaging/.vagrant
 dist
 dtop

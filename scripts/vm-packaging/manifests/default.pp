@@ -13,7 +13,7 @@ exec { "unpack-go":
 }
 ->
 package { "rpm":
-    ensure   => "installed",
+    ensure   => "4.9.1.1-1ubuntu0.2",
 }
 ->
 package { "fpm":
@@ -25,6 +25,8 @@ exec {  "make-distros":
 	command => "make dist-all",
 	cwd => "/dtop-dist",
 	creates => [ "/dtop-dist/dist/dtop_0.1-linux-amd64.deb",
-				 "/dtop-dist/dist/dtop_0.1-linux-amd64.rpm" ],
+				 "/dtop-dist/dist/dtop_0.1-linux-amd64.rpm",
+				 "/dtop-dist/dist/dtop_0.1-linux-386.deb",
+				 "/dtop-dist/dist/dtop_0.1-linux-386.rpm" ],
 	path => [ "/usr/bin/", "/usr/local/bin/", "/bin/" ]	
 }
