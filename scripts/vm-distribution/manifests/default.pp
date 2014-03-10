@@ -26,7 +26,7 @@ exec {  "make-distros":
 	cwd => "/dtop-dist",
 	creates => [ "/dtop-dist/dist/dtop_0.1-linux-amd64.deb",
 				 "/dtop-dist/dist/dtop_0.1-linux-amd64.rpm",
-				 "/dtop-dist/dist/dtop_0.1-linux-386.deb",
-				 "/dtop-dist/dist/dtop_0.1-linux-386.rpm" ],
+				 "/dtop-dist/dist/dtop_0.1-linux-i386.deb",
+				 "/dtop-dist/dist/dtop_0.1-linux-i386.rpm" ],
 	path => [ "/usr/bin/", "/usr/local/bin/", "/bin/" ]	
 }

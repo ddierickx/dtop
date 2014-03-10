@@ -1,4 +1,5 @@
 #!/bin/bash
+# This helper script is called by the Makefile for the different distributions.
 export GOROOT=$1
 export GOPATH=$2
 export GOOS=$3

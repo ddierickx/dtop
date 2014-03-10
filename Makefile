@@ -1,4 +1,11 @@
-VERSION := 0.1
+DIST_NAME := dtop
+DIST_VERSION := 0.1
+DIST_DESCRIPTION := A monitoring tools that brings htop like functionality and more to the webbrowser.
+DIST_VENDOR := Dominique Dierickx
+DIST_MAINTAINER := d.dierickx@gmail.com
+DIST_URL := https://github.com/ddierickx/dtop
+
+DIST_CATEGORY := monitoring
 
 ifndef GOROOT
 $(warning GOROOT is not set, setting default (/opt/go).)
@@ -32,25 +39,74 @@ dist-linux-deb-amd64 :
 	cp static /usr/local/share/dtop -rf
 	cp scripts/debian/dtopd -f /etc/init.d/
 	mkdir -p dist
-	fpm --provides dtop -s dir -t deb -n dtop -v $(VERSION) -p dist/dtop_VERSION-linux-amd64.deb --after-install scripts/debian/run /usr/bin/dtop /usr/local/share/dtop/static /etc/init.d/dtopd
+	fpm -s dir \
+		-t deb \
+		--provides "$(DIST_NAME)" \
+		--name "$(DIST_NAME)" \
+		--description "$(DIST_DESCRIPTION)" \
+		--version "$(DIST_VERSION)" \
+		--vendor "$(DIST_VENDOR)" \
+		--maintainer "$(DIST_MAINTAINER)" \
+		--url "$(DIST_URL)" \
+		--category "$(DIST_CATEGORY)" \
+		--vendor "$(DIST_VENDOR)" \
+		--architecture "x86_64" \
+		--package "dist/dtop_VERSION-linux-ARCH.deb" \
+		--after-install "scripts/debian/run" \
+		"/usr/bin/dtop" \
+		"/usr/local/share/dtop/static" \
+		"/etc/init.d/dtopd"
 
 dist-linux-rpm-amd64 :
 	$(info Packaging linux amd64 rpm distribution)
 	cp bin/linux-amd64/dtop /usr/bin/ -f
 	mkdir -p /usr/local/share/dtop
 	cp static /usr/local/share/dtop -rf
-	cp scripts/debian/dtopd -f /etc/init.d/
+	cp scripts/rhel/dtopd -f /etc/init.d/
 	mkdir -p dist
-	fpm --provides dtop -s dir -t rpm -n dtop -v $(VERSION) -d redhat-lsb-core -p dist/dtop_VERSION-linux-amd64.rpm /usr/bin/dtop /usr/local/share/dtop/static /etc/init.d/dtopd
+	fpm -s dir \
+		-t rpm \
+		--depends "redhat-lsb-core" \
+		--provides "$(DIST_NAME)" \
+		--name "$(DIST_NAME)" \
+		--description "$(DIST_DESCRIPTION)" \
+		--version "$(DIST_VERSION)" \
+		--vendor "$(DIST_VENDOR)" \
+		--maintainer "$(DIST_MAINTAINER)" \
+		--url "$(DIST_URL)" \
+		--category "$(DIST_CATEGORY)" \
+		--vendor "$(DIST_VENDOR)" \
+		--architecture "amd64" \
+		--package "dist/dtop_VERSION-linux-amd64.rpm" \
+		--after-install "scripts/rhel/run" \
+		"/usr/bin/dtop" \
+		"/usr/local/share/dtop/static" \
+		"/etc/init.d/dtopd"
 
 dist-linux-rpm-386 :
 	$(info Packaging linux 386 rpm distribution)
 	cp bin/linux-386/dtop /usr/bin/ -f
 	mkdir -p /usr/local/share/dtop
 	cp static /usr/local/share/dtop -rf
-	cp scripts/debian/dtopd -f /etc/init.d/
+	cp scripts/rhel/dtopd -f /etc/init.d/
 	mkdir -p dist
-	fpm --provides dtop -s dir -t rpm -n dtop -v $(VERSION) -d redhat-lsb-core -p dist/dtop_VERSION-linux-386.rpm /usr/bin/dtop /usr/local/share/dtop/static /etc/init.d/dtopd
+	fpm -s dir \
+		-t rpm \
+		--depends "redhat-lsb-core" \
+		--provides "$(DIST_NAME)" \
+		--name "$(DIST_NAME)" \
+		--description "$(DIST_DESCRIPTION)" \
+		--version "$(DIST_VERSION)" \
+		--vendor "$(DIST_VENDOR)" \
+		--maintainer "$(DIST_MAINTAINER)" \
+		--url "$(DIST_URL)" \
+		--category "$(DIST_CATEGORY)" \
+		--vendor "$(DIST_VENDOR)" \
+		--package "dist/dtop_VERSION-linux-i386.rpm" \
+		--after-install "scripts/rhel/run" \
+		"/usr/bin/dtop" \
+		"/usr/local/share/dtop/static" \
+		"/etc/init.d/dtopd"
 
 dist-linux-deb-386 :
 	$(info Packaging linux 386 deb distribution)
@@ -59,8 +115,23 @@ dist-linux-deb-386 :
 	cp static /usr/local/share/dtop -rf
 	cp scripts/debian/dtopd -f /etc/init.d/
 	mkdir -p dist
-	fpm --provides dtop -s dir -t deb -n dtop -v $(VERSION) -p dist/dtop_VERSION-linux-386.deb --after-install scripts/debian/run /usr/bin/dtop /usr/local/share/dtop/static /etc/init.d/dtopd
-
+	fpm -s dir \
+		-t deb \
+		--provides "$(DIST_NAME)" \
+		--name "$(DIST_NAME)" \
+		--description "$(DIST_DESCRIPTION)" \
+		--version "$(DIST_VERSION)" \
+		--vendor "$(DIST_VENDOR)" \
+		--maintainer "$(DIST_MAINTAINER)" \
+		--url "$(DIST_URL)" \
+		--category "$(DIST_CATEGORY)" \
+		--vendor "$(DIST_VENDOR)" \
+		--architecture "i386" \
+		--package "dist/dtop_VERSION-linux-ARCH.deb" \
+		--after-install "scripts/debian/run" \
+		"/usr/bin/dtop" \
+		"/usr/local/share/dtop/static" \
+		"/etc/init.d/dtopd"
 
 format :
 	$(info Formatting sources)
