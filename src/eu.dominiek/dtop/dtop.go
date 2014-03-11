@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"code.google.com/p/go.net/websocket"
+	"github.com/gorilla/websocket"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -47,7 +47,7 @@ func main() {
 	}
 
 	http.Handle("/", http.FileServer(http.Dir(path)))
-	http.Handle("/events", websocket.Handler(eventServer.handler))
+	http.Handle("/events", http.HandlerFunc(eventServer.handler))
 
 	log.Printf("starting server at http://127.0.0.1:%d", *port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
@@ -146,10 +146,19 @@ func (eventServer *EventServer) submitLastEvents(listener chan Event) {
 }
 
 // Client handler, register, monitor channel and transmit, unregister.
-func (eventServer *EventServer) handler(ws *websocket.Conn) {
+func (eventServer *EventServer) handler(w http.ResponseWriter, r *http.Request) {
+	ws, err := websocket.Upgrade(w, r, nil, 1024, 1024)
+    
+    if _, ok := err.(websocket.HandshakeError); ok {
+        http.Error(w, "Not a websocket handshake", 400)
+        return
+    } else if err != nil {
+        log.Println(err)
+        return
+    }
+
 	listener, listenerId := eventServer.register()
-	// TODO: get actual client ip address.
-	log.Printf("client connect %s (id=%d)", ws.Request().RemoteAddr, listenerId)
+	log.Printf("client connect %s (id=%d)", ws.RemoteAddr(), listenerId)
 
 	go eventServer.submitLastEvents(listener)
 
@@ -163,12 +172,12 @@ func (eventServer *EventServer) handler(ws *websocket.Conn) {
 		data := eventServer.eventSerializer(item)
 		Debugf("sent event: %s", data)
 
-		if _, err := ws.Write(data); err != nil {
+		if err := ws.WriteMessage(websocket.TextMessage, data); err != nil {
 			break
 		}
 	}
 	eventServer.unregister(listenerId)
-	log.Printf("client disconnect %s (id=%d)", ws.Request().RemoteAddr, listenerId)
+	log.Printf("client disconnect %s (id=%d)", ws.RemoteAddr(), listenerId)
 }
 
 // Server->client serialization protocol function template.

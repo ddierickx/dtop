@@ -1,4 +1,5 @@
 scripts/vm-centos/.vagrant
 scripts/vm-distribution/.vagrant
 dist
+pkg
 dtop
