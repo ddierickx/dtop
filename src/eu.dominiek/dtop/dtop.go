@@ -69,6 +69,7 @@ func authHandler(eventServer *EventServer) func(http.ResponseWriter, *http.Reque
 				eventServer.eventListeners[token.String()] = nil
 				w.Write([]byte(token.String()))
 			} else {
+				log.Printf("received wrong login attempt (user=%s)", username)
 				http.Error(w, "bad credentials", 401)
 			}
 		} else {
