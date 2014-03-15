@@ -5,31 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>dtop</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/htop.css"> 
+    <link rel="stylesheet" type="text/css" href="css/dtop.css"> 
 
 	<script type="text/javascript" src="js/knockout-3.0.0.js"></script>
 	<script type="text/javascript" src="js/knockout.simplegrid.3.0.js"></script>
     <script type="text/javascript" src="js/modernizr.js"></script>
   </head>
-  <body style="display: none">   
+  <body>   
+
+	<div id="auth-dialog">
+      <form class="form-signin" role="form">
+        <h3 class="form-signin-heading" data-bind="text: serverInfo().Server"></h3>
+        <p class="well bg-success" data-bind="text: serverInfo().Description"></p>
+        <input type="username" data-bind="value: username" class="form-control" placeholder="Username" required autofocus>
+        <input type="password" data-bind="value: password" class="form-control" placeholder="Password" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" data-bind="click: requestToken">Log in</button>
+		<p></p>
+		<div class="alert alert-danger" data-bind="visible: failedLogin">Whoops... that's not right.</div>
+      </form>
+	</div>
   
-<nav class="navbar navbar-default" role="navigation">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">dtop</a>
-    </div>
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li><a href="#systeminfo">System info</a></li>
-        <li><a href="#cpu">CPU</a></li>
-        <li><a href="#processes">Processes</a></li>
-        <li><a href="#diskusage">Disks</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="https://github.com/ddierickx/dtop" target="_blank">About</a></li>
-      </ul>
-    </div>
-</nav>
+  <div id="content" style="display: none">
+	<nav class="navbar navbar-default" role="navigation">
+	  <div class="container-fluid">
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="#">dtop</a>
+	    </div>
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+	      <ul class="nav navbar-nav">
+	        <li><a href="#systeminfo">System info</a></li>
+	        <li><a href="#cpu">CPU</a></li>
+	        <li><a href="#processes">Processes</a></li>
+	        <li><a href="#diskusage">Disks</a></li>
+	      </ul>
+	      <ul class="nav navbar-nav navbar-right">
+	        <li><a href="https://github.com/ddierickx/dtop" target="_blank">About</a></li>
+	      </ul>
+	    </div>
+	</nav>
 
   	<div class="container-fluid">
   		<div class="row">
@@ -228,6 +241,10 @@
 				self.LOADAVG_LIMIT_ALERT = 0.70;
 				self.PS_COMMAND_LENGTH=100;
 				/* observables */
+				self.failedLogin = ko.observable(false);
+				self.username = ko.observable("");
+				self.password = ko.observable("");
+				self.serverInfo = ko.observable({});
 				self.initialized = ko.observable(false);
       			self.processFilter = ko.observable("");
       			self.cpu = ko.observable({});
@@ -362,6 +379,22 @@
    					//$("#memory-meter").sparkline( self.memory_usage.Swapped, options_swapped );
    					//$("#swapped-meter").sparkline( self.memory_usage.Swapped, options_swapped );
 				});
+
+		    	self.requestToken = function () {
+		    		username = self.username();
+		    		password = self.password();
+		    		console.log("logging in " + username + " with pw " + password);
+			    	$.post("/auth", { "username": username, "password": password })
+			    		.done(function(response) {
+				    		self.failedLogin(false);
+				    		$("#auth-dialog").fadeOut(function() { $("#content").fadeIn(); });
+				    		console.log(response);
+				    		connect(response);
+				    	})
+				    	.error(function(response) {
+				    		self.failedLogin(true);
+				    	});
+		    	}
 			};
 
 			function initializeMeters(viewModel) {
@@ -399,63 +432,84 @@
 
 			var viewModel = new ViewModel();
 
-			var loc = window.location;
-			var ws_uri = "ws://" + loc.host + loc.pathname + "events";
-			var websocket = new WebSocket(ws_uri);
+			function connect(token) {
+				var loc = window.location;
+				var ws_uri = "ws://" + loc.host + loc.pathname + "events";
+				var websocket = new WebSocket(ws_uri);
 
-			websocket.onopen = function(evt) { };
-			websocket.onclose = function(evt) { };
-			websocket.onerror = function(evt) { alert("Websocket error: " + evt); };
-			websocket.onmessage = function(evt) {
-								obj = JSON.parse(evt.data)
+				websocket.onopen = function(evt) {
+					websocket.send(token);
+				};
+				websocket.onclose = function(evt) { };
+				websocket.onerror = function(evt) { alert("Websocket error: " + evt); };
+				websocket.onmessage = function(evt) {
+									obj = JSON.parse(evt.data)
 
-								switch (obj.Q) {
-									case "sys.cpu":
-										viewModel.cpu(obj.V);
-										break;
-									case "sys.processes":
-										var processes = obj.V;
-										viewModel.process_count(processes.length);
-										// sort on cpu usage by default
-										processes.sort(sortBy('Cpu', false));
-										filtered = $.grep(processes, function(d, i) {
-											filter = viewModel.processFilter();
-											return d.Command.indexOf(filter) != -1;
-										});
+									switch (obj.Q) {
+										case "sys.cpu":
+											viewModel.cpu(obj.V);
+											break;
+										case "sys.processes":
+											var processes = obj.V;
+											viewModel.process_count(processes.length);
+											// sort on cpu usage by default
+											processes.sort(sortBy('Cpu', false));
+											filtered = $.grep(processes, function(d, i) {
+												filter = viewModel.processFilter();
+												return d.Command.indexOf(filter) != -1;
+											});
 
-										viewModel.processes(filtered);
-										break;
-									case "sys.memory":
-										viewModel.memory(obj.V);
-										break;
-									case "sys.uptime":
-										viewModel.uptime(obj.V);
-										break;
-									case "sys.users":
-										viewModel.users(obj.V);
-										break;
-									case "sys.loadavg":
-										viewModel.loadAvg(obj.V);
-										break;
-									case "sys.basics":
-										viewModel.basicInfo(obj.V);
-										break;
-									case "sys.disk":
-										var diskInfo = obj.V;
-										diskInfo.sort(sortBy('Name', true));
-										viewModel.diskInfo(obj.V);
-										break;
-									case "sig.ready":
-										initializeMeters(viewModel);
-										viewModel.initialized(true);
-										$("body").fadeIn();
-										break;
-								}
-			};
+											viewModel.processes(filtered);
+											break;
+										case "sys.memory":
+											viewModel.memory(obj.V);
+											break;
+										case "sys.uptime":
+											viewModel.uptime(obj.V);
+											break;
+										case "sys.users":
+											viewModel.users(obj.V);
+											break;
+										case "sys.loadavg":
+											viewModel.loadAvg(obj.V);
+											break;
+										case "sys.basics":
+											viewModel.basicInfo(obj.V);
+											break;
+										case "sys.disk":
+											var diskInfo = obj.V;
+											diskInfo.sort(sortBy('Name', true));
+											viewModel.diskInfo(obj.V);
+											break;
+										case "sig.ready":
+											initializeMeters(viewModel);
+											viewModel.initialized(true);
+											break;
+									}
+				};
+			}
 
 			ko.applyBindings(viewModel, document.getElementById("dtop"));
 			$("#txtFilter").focus();
+
+            function showAuthPopup(info) {
+		      	$('#auth-dialog').fadeIn();
+		    }
+
+		    function performAuth() {
+		     	$.get("/auth", function(response) {
+		      			info = JSON.parse(response);
+		      			viewModel.serverInfo(info);
+
+		      			if (info.Auth) {
+		      				showAuthPopup(info);
+		      			}
+		    	});
+		    }
+
+		    performAuth();
 		});
     </script>
+   </div>
   </body>
 </html
