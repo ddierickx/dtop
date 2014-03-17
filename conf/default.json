@@ -1,0 +1,12 @@
+{
+    "Name": "my server",
+    "Description": "my description",
+    "StaticFolder": "static",
+    "Port": 12345,
+    "Users": [
+        {
+            "Username": "u",
+            "Password": "p"
+        }
+    ]
+}

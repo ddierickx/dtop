@@ -14,14 +14,16 @@
   <body>   
 
 	<div id="auth-dialog">
-      <form class="form-signin" role="form">
-        <h3 class="form-signin-heading" data-bind="text: serverInfo().Server"></h3>
-        <p class="well bg-success" data-bind="text: serverInfo().Description"></p>
+	  <p>&nbsp</p>
+      <form class="form-signin well" role="form">
+        <h3 class="form-signin-heading" style="margin-top: 5px" data-bind="text: serverInfo().Server"></h3>
+        <p data-bind="text: serverInfo().Description"></p>
         <input type="username" data-bind="value: username" class="form-control" placeholder="Username" required autofocus>
-        <input type="password" data-bind="value: password" class="form-control" placeholder="Password" required>
+        <input type="password" style="margin-top: 10px" data-bind="value: password" class="form-control" placeholder="Password" required>
         <button class="btn btn-lg btn-primary btn-block" type="submit" data-bind="click: requestToken">Log in</button>
 		<p></p>
-		<div class="alert alert-danger" data-bind="visible: failedLogin">Whoops... that's not right.</div>
+		<div class="alert alert-danger" data-bind="visible: failedLogin">Whoops... invalid credentials.</div>
+      	<div style="font-size:x-small; text-align:center; margin-top: 15px;"><a href="" target="#blank">dtop</a> version <span data-bind="text: serverInfo().Version"></span></div>
       </form>
 	</div>
   

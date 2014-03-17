@@ -19,7 +19,7 @@ func TestDTopConfigurationSerializationRoundtrip(t *testing.T) {
 }
 
 func checkValidity(cfg *DTopConfiguration, valid bool) {
-	if result, _ := ValidateDTopConfiguration(cfg); result != valid {
+	if result, _ := cfg.IsValid(); result != valid {
 		panic(fmt.Sprintf("Expected configuration to be valid=%t, but was %t", valid, result))
 	}
 }

@@ -107,6 +107,7 @@ func (eventServer *EventServer) handler(w http.ResponseWriter, r *http.Request) 
 
     if _, ok := eventServer.eventListeners[token]; !ok {
     	http.Error(w, "unauthorized access", 201)
+    	return
 	}
 
 	listener := eventServer.register(token)

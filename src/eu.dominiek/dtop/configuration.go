@@ -41,7 +41,7 @@ func NewDTopConfiguration(name string, description string, users []DTopUser, sta
 }
 
 // Validate the DTopConfiguration instance.
-func ValidateDTopConfiguration(cfg *DTopConfiguration) (bool, error) {
+func (cfg *DTopConfiguration) IsValid() (bool, error) {
 	if cfg.Name == "" {
 		return false, errors.New(fmt.Sprintf("No name defined."))
 	}
