@@ -1,13 +1,13 @@
 package main
 
 import (
-	"os"
 	"flag"
 	"fmt"
-	"log"
-	"io/ioutil"
 	"github.com/nu7hatch/gouuid"
+	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 )
 
 var configFile = flag.String("c", "", "the location of the server configuration")
@@ -23,15 +23,15 @@ func main() {
 	}
 
 	if _, err := os.Stat(*configFile); os.IsNotExist(err) {
-    	panic(fmt.Sprintf("The configuration file does not exist: %s", configFile))
+		panic(fmt.Sprintf("The configuration file does not exist: %s", configFile))
 	}
 
 	log.Printf("Reading configuration from '%s'", *configFile)
 	jsonBlob, err := ioutil.ReadFile(*configFile)
-    
-    if err != nil {
-    	panic(fmt.Sprintf("Error reading configuration file: %s", err.Error()))
-    }
+
+	if err != nil {
+		panic(fmt.Sprintf("Error reading configuration file: %s", err.Error()))
+	}
 
 	cfg, err := DeserializeDTopConfigurationFromJson(jsonBlob)
 
@@ -44,7 +44,7 @@ func main() {
 	}
 
 	// registered publishers
-	eventPublishers := [...]EventPublisher{ memory, uptime, loadavg, cpuinfo, users, processinfo, basicinfo, disk }
+	eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo, basicinfo, disk}
 
 	// start publishers.
 	events := make(chan Event)
@@ -75,7 +75,7 @@ func main() {
 
 	log.Printf("starting server at 0.0.0.0, port %d", cfg.Port)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), nil)
-	
+
 	if err != nil {
 		panic("error running server: " + err.Error())
 	}
@@ -104,7 +104,7 @@ func authHandler(eventServer *EventServer) func(http.ResponseWriter, *http.Reque
 			}
 		} else if r.Method == "GET" {
 			w.Write([]byte(fmt.Sprintf("{\"Server\":\"%s\",\"Auth\":true,\"Description\":\"%s\",\"Version\":\"%s\"}",
-								"dominiek-laptop", "Work laptop", "1.0")))
+				"dominiek-laptop", "Work laptop", "1.0")))
 		}
 	}
 }

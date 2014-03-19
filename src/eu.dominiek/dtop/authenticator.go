@@ -1,11 +1,11 @@
 package main
 
-import(
+import (
 	"github.com/nu7hatch/gouuid"
 )
 
 type Authenticator struct {
-	cfg *DTopConfiguration
+	cfg      *DTopConfiguration
 	sessions map[string]DTopUser
 }
 

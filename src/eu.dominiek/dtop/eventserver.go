@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-
 // The eventserver will read from the publishers and fanout events to all connected clients.
 type EventServer struct {
 	eventsCount         int64
@@ -59,7 +58,7 @@ func (eventServer *EventServer) fanOutSafe(listener chan Event, event Event) {
 }
 
 // Register a new client connection channel.
-func (eventServer *EventServer) register(token string) (chan Event) {
+func (eventServer *EventServer) register(token string) chan Event {
 	listener := make(chan Event)
 	eventServer.eventListeners[token] = listener
 	return listener
@@ -93,21 +92,21 @@ func (eventServer *EventServer) submitLastEvents(listener chan Event) {
 // Client handler, register, monitor channel and transmit, unregister.
 func (eventServer *EventServer) handler(w http.ResponseWriter, r *http.Request) {
 	ws, err := websocket.Upgrade(w, r, nil, 1024, 1024)
-    
-    if _, ok := err.(websocket.HandshakeError); ok {
-        http.Error(w, "not a valid websocket handshake", 400)
-        return
-    } else if err != nil {
-        log.Println(err)
-        return
-    }
-    
-    _, tokenBytes, _ := ws.ReadMessage()
-    token := string(tokenBytes)
 
-    if _, ok := eventServer.eventListeners[token]; !ok {
-    	http.Error(w, "unauthorized access", 201)
-    	return
+	if _, ok := err.(websocket.HandshakeError); ok {
+		http.Error(w, "not a valid websocket handshake", 400)
+		return
+	} else if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, tokenBytes, _ := ws.ReadMessage()
+	token := string(tokenBytes)
+
+	if _, ok := eventServer.eventListeners[token]; !ok {
+		http.Error(w, "unauthorized access", 201)
+		return
 	}
 
 	listener := eventServer.register(token)

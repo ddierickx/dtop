@@ -1,19 +1,19 @@
 package main
 
 import (
-	"os"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"encoding/json"
+	"os"
 )
 
 // Holds the application's configuration settings.
 type DTopConfiguration struct {
-	Users []DTopUser
-	Name string
-	Description string
+	Users        []DTopUser
+	Name         string
+	Description  string
 	StaticFolder string
-	Port int
+	Port         int
 }
 
 // Defines a dtop user.
