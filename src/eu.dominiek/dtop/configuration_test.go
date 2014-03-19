@@ -13,6 +13,10 @@ func TestDTopConfigurationSerializationRoundtrip(t *testing.T) {
 	jsonBytes, _ := SerializeDTopConfigurationToJson(cfg)
 	deserializedCfg, _ := DeserializeDTopConfigurationFromJson(jsonBytes)
 
+    if cfg.IsAuth() != (len(users) > 0) {
+        panic(fmt.Sprintf("IsAuth call returned an invalid result, expected %t but was %t.", cfg.IsAuth, (len(users)>0)))
+    }
+
 	if !reflect.DeepEqual(cfg, deserializedCfg) {
 		panic("Serialization/deserialization failure.")
 	}

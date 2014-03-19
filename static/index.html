@@ -13,10 +13,10 @@
   </head>
   <body>   
 
-	<div id="auth-dialog">
+	<div id="auth-dialog" style="display: none">
 	  <p>&nbsp</p>
       <form class="form-signin well" role="form">
-        <h3 class="form-signin-heading" style="margin-top: 5px" data-bind="text: serverInfo().Server"></h3>
+        <h3 class="form-signin-heading" style="margin-top: 5px" data-bind="text: serverInfo().Name"></h3>
         <p data-bind="text: serverInfo().Description"></p>
         <input type="username" data-bind="value: username" class="form-control" placeholder="Username" required autofocus>
         <input type="password" style="margin-top: 10px" data-bind="value: password" class="form-control" placeholder="Password" required>
@@ -388,14 +388,17 @@
 		    		console.log("logging in " + username + " with pw " + password);
 			    	$.post("/auth", { "username": username, "password": password })
 			    		.done(function(response) {
-				    		self.failedLogin(false);
-				    		$("#auth-dialog").fadeOut(function() { $("#content").fadeIn(); });
-				    		console.log(response);
-				    		connect(response);
+			    			self.authenticationSuccess(response);
 				    	})
 				    	.error(function(response) {
 				    		self.failedLogin(true);
 				    	});
+		    	}
+
+		    	self.authenticationSuccess = function(token) {
+					self.failedLogin(false);
+				    $("#auth-dialog").fadeOut(function() { $("#content").fadeIn(); });
+				    connect(token);
 		    	}
 			};
 
@@ -505,6 +508,8 @@
 
 		      			if (info.Auth) {
 		      				showAuthPopup(info);
+		      			} else {
+		      				viewModel.requestToken();
 		      			}
 		    	});
 		    }

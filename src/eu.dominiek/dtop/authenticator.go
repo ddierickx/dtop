@@ -17,17 +17,26 @@ func NewAuthenticator(cfg *DTopConfiguration) *Authenticator {
 }
 
 func (auth *Authenticator) Login(username string, password string) (bool, string) {
-	hashed := auth.hashPassword(password)
+	authenticated := false
+	token := ""
 
-	for _, user := range auth.cfg.Users {
-		if user.Username == username && user.Password == hashed {
-			token := auth.generateToken()
-			auth.sessions[token] = user
-			return true, token
+	if auth.cfg.IsAuth() {
+		hashed := auth.hashPassword(password)
+
+		for _, user := range auth.cfg.Users {
+			if user.Username == username && user.Password == hashed {
+				token = auth.generateToken()
+				auth.sessions[token] = user
+				authenticated = true
+			}
 		}
+	} else {
+		token = auth.generateToken()
+		auth.sessions[token] = *NewDTopUser("unauthenticated", "")
+		authenticated = true
 	}
 
-	return false, ""
+	return authenticated, token
 }
 
 func (auth *Authenticator) Logout(token string) {

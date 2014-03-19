@@ -40,6 +40,10 @@ func NewDTopConfiguration(name string, description string, users []DTopUser, sta
 	return cfg
 }
 
+func (cfg *DTopConfiguration) IsAuth() bool {
+	return len(cfg.Users) > 0
+}
+
 // Validate the DTopConfiguration instance.
 func (cfg *DTopConfiguration) IsValid() (bool, error) {
 	if cfg.Name == "" {
