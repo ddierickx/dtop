@@ -1,18 +1,17 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"errors"
 	"net/http"
 	"os"
 )
 
 var configFile = flag.String("c", "", "the location of the server configuration")
 var debug *bool = flag.Bool("d", false, "enable debug logging")
-
 
 // Load the configuration and do the necessary error handling.
 func loadConfigFile(path string) (*DTopConfiguration, error) {

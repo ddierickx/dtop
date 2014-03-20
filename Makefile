@@ -133,12 +133,12 @@ dist-linux-deb-386 :
 		"/usr/local/share/dtop/static" \
 		"/etc/init.d/dtopd"
 
-run: test
+run : test
 	$(info Compiling and running dtop)
 	$(GO) build eu.dominiek/dtop
 	./dtop -c conf/default.json
 
-test:
+test : format
 	$(info Running tests)
 	$(GO) test fmt eu.dominiek/dtop
 
