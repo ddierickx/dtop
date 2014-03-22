@@ -14,12 +14,24 @@ type DTopConfiguration struct {
 	Description  string
 	StaticFolder string
 	Port         int
+	Services     []Service
+}
+
+// Defines a Service
+type Service struct {
+	Name string
 }
 
 // Defines a dtop user.
 type DTopUser struct {
 	Username string
 	Password string
+}
+
+func NewService(name string) *Service {
+	service := new(Service)
+	service.Name = name
+	return service
 }
 
 func NewDTopUser(username string, password string) *DTopUser {
@@ -30,13 +42,14 @@ func NewDTopUser(username string, password string) *DTopUser {
 }
 
 // Constructor for DTopConfiguration
-func NewDTopConfiguration(name string, description string, users []DTopUser, staticFolder string, port int) *DTopConfiguration {
+func NewDTopConfiguration(name string, description string, users []DTopUser, staticFolder string, port int, services []Service) *DTopConfiguration {
 	cfg := new(DTopConfiguration)
 	cfg.Name = name
 	cfg.Description = description
 	cfg.Users = users
 	cfg.StaticFolder = staticFolder
 	cfg.Port = port
+	cfg.Services = services
 	return cfg
 }
 

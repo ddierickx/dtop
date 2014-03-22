@@ -2,5 +2,15 @@
     "Name": "my server",
     "Description": "my description",
     "StaticFolder": "static",
-    "Port": 12345
+    "Port": 12345,
+    "Users": [ { "Username": "u", "Password": "p" } ],
+    "Services": [
+        { "Name": "ufw" },
+        { "Name": "ssh" },
+        { "Name": "cups" },
+        { "Name": "tomcat6" },
+        { "Name": "puppet" },
+        { "Name": "nfs-kernel-server" },
+        { "Name": "postgresql" }
+    ]
  }

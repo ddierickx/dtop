@@ -58,12 +58,24 @@ type ProcessInfo struct {
 	Command string
 }
 
+type ServiceInfo struct {
+	Name    string
+	Running bool
+}
+
 type User struct {
 	Name string
 }
 
 type Users struct {
 	All []User
+}
+
+func NewServiceInfo(name string, running bool) ServiceInfo {
+	serviceInfo := new(ServiceInfo)
+	serviceInfo.Name = name
+	serviceInfo.Running = running
+	return *serviceInfo
 }
 
 func NewEvent(qualifier string, value interface{}) Event {

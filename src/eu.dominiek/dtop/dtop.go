@@ -10,6 +10,8 @@ import (
 	"os"
 )
 
+const VERSION = "1.0-SNAPSHOT"
+
 var configFile = flag.String("c", "", "the location of the server configuration")
 var debug *bool = flag.Bool("d", false, "enable debug logging")
 
@@ -57,7 +59,7 @@ func main() {
 	auth := NewAuthenticator(cfg)
 
 	// registered publishers
-	eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo, basicinfo, disk}
+	eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo, basicinfo, disk, services(cfg.Services)}
 
 	// start publishers.
 	events := make(chan Event)
@@ -103,7 +105,7 @@ func authHandler(eventServer *EventServer, cfg *DTopConfiguration, auth *Authent
 			// TODO: serialize object iso manually creating string here...
 			msg := "{\"Name\":\"%s\",\"Auth\":%t,\"Description\":\"%s\",\"Version\":\"%s\"}"
 			auth := cfg.IsAuth()
-			msg = fmt.Sprintf(msg, cfg.Name, auth, cfg.Description, "1.0-SNAPSHOT")
+			msg = fmt.Sprintf(msg, cfg.Name, auth, cfg.Description, VERSION)
 			w.Write([]byte(msg))
 		}
 	}

@@ -39,6 +39,7 @@
 	        <li><a href="#cpu">CPU</a></li>
 	        <li><a href="#processes">Processes</a></li>
 	        <li><a href="#diskusage">Disks</a></li>
+	        <li><a href="#services">Services</a></li>
 	      </ul>
 	      <ul class="nav navbar-nav navbar-right">
 	        <li><a href="https://github.com/ddierickx/dtop" target="_blank">About</a></li>
@@ -142,16 +143,8 @@
       		</div>
   		</div>
 
+
     <div class="row">
-	  <div class="col-md-6">
-		<div class="panel panel-default">
-		  <div class="panel-heading">
-		    <h3 class="panel-title">CPU</h3><a name="cpu"></a>
-		  </div>
-			<div id="cpu-meters" class="list-group">
-			</div>
-		</div>
-      </div>
 	  <div class="col-md-6">
 		<div class="panel panel-default">
 		  <div class="panel-heading">
@@ -162,9 +155,31 @@
 			</div>
 		</div>
       </div>
+	<div class="col-md-6">
+		<div class="panel panel-default">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">Services</h3><a name="services"></a>
+		  </div>
+		  	<div class="list-group">
+				<div data-bind="simpleGrid: servicesGridViewModel"></div>
+			</div>
+		</div>
+      </div>
     </div>
+
+
     <div class="row">
-    </div>
+	  <div class="col-md-12">
+		<div class="panel panel-default">
+		  <div class="panel-heading">
+		    <h3 class="panel-title">CPU</h3><a name="cpu"></a>
+		  </div>
+			<div id="cpu-meters" class="list-group">
+			</div>
+		</div>
+      </div>
+     </div>
+
     <div class="row">
 	  <div class="col-md-12">
 		<div class="panel panel-default">
@@ -241,7 +256,7 @@
       			self.slice = function(ar) { return ar.slice(Math.max(ar.length - 100, 0), ar.length) };
 				self.LOADAVG_LIMIT_WARNING = 0.50
 				self.LOADAVG_LIMIT_ALERT = 0.70;
-				self.PS_COMMAND_LENGTH=100;
+				self.PS_COMMAND_LENGTH=150;
 				/* observables */
 				self.failedLogin = ko.observable(false);
 				self.username = ko.observable("");
@@ -252,6 +267,7 @@
       			self.cpu = ko.observable({});
 				self.memory = ko.observable({});
 				self.processes = ko.observableArray([]);
+				self.services = ko.observableArray([]);
 				self.diskInfo = ko.observableArray([]);
 				self.users = ko.observable({ All: [] });
 				self.uptime = ko.observable({});
@@ -281,6 +297,22 @@
 			        	},*/
 			        ],
 			        pageSize: 10
+			    });
+
+				self.servicesGridViewModel = new ko.simpleGrid.viewModel({
+			        data: self.services,
+			        columns: [
+			            { headerText: "Name", rowText: "Name" },
+			            { headerText: "Running",
+			             	rowText: function(item) {
+			             		var clazz = item.Running ? "label-success" : "label-danger";
+			             		var txt = item.Running ? "YES" : "NO";
+			            		return "<span class='label " + clazz + "'>" + txt + "</span>";
+			            	}
+			        	},
+			        ],
+			        hidePagination: true,
+			        pageSize: 200	
 			    });
 
 			    self.diskUsageGridViewModel = new ko.simpleGrid.viewModel({
@@ -342,8 +374,8 @@
 
         		self.cpuUsageColor = ko.computed(function() { return getPerformanceColor(self, self.cpu_used()); }, self);
         		self.memoryUsageColor = ko.computed(function() { return getPerformanceColor(self, Math.floor(100*(self.memory_used() / self.memory().TotalKb))); }, self);
-
-        		self.cpu.subscribe(function(cpus) {
+		
+				self.cpu.subscribe(function(cpus) {
         			if (viewModel.initialized()) {
 						for (i = 0; i < cpus.length; i++) {
 							self.cpu_usages[i].push(Math.round(cpus[i].Usage));
@@ -385,7 +417,6 @@
 		    	self.requestToken = function () {
 		    		username = self.username();
 		    		password = self.password();
-		    		console.log("logging in " + username + " with pw " + password);
 			    	$.post("/auth", { "username": username, "password": password })
 			    		.done(function(response) {
 			    			self.authenticationSuccess(response);
@@ -430,7 +461,7 @@
 								   "</div>";
 						$(cpu_row).append($(core_div));
 					}
-					
+
 					$(cpu_view).append(cpu_row);
 				}
 			}
@@ -485,6 +516,9 @@
 											var diskInfo = obj.V;
 											diskInfo.sort(sortBy('Name', true));
 											viewModel.diskInfo(obj.V);
+											break;
+										case "sys.services":
+											viewModel.services(obj.V);
 											break;
 										case "sig.ready":
 											initializeMeters(viewModel);

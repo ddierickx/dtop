@@ -329,6 +329,31 @@ func basicinfo(events chan Event) {
 	events <- NewEvent("sys.basics", basicInfo)
 }
 
+// Run 'service status'.
+func services(services []Service) func(events chan Event) {
+	return func(events chan Event) {
+		for {
+			var serviceInfos []ServiceInfo
+
+			for _, service := range services {
+				var serviceInfo ServiceInfo
+				_, err := capture_stdout(fmt.Sprintf("/etc/init.d/%s", service.Name), "status")
+
+				if err == nil {
+					serviceInfo = NewServiceInfo(service.Name, true)
+				} else {
+					serviceInfo = NewServiceInfo(service.Name, false)
+				}
+
+				serviceInfos = append(serviceInfos, serviceInfo)
+			}
+
+			events <- NewEvent("sys.services", serviceInfos)
+			time.Sleep(DELAY)
+		}
+	}
+}
+
 // Capture stdout when running the cmd with the given arguments. Output is split on newline.
 func capture_stdout(cmd string, args string) ([]string, error) {
 	command := exec.Command(cmd, args)

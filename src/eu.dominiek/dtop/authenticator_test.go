@@ -7,7 +7,9 @@ import (
 func TestLogin(t *testing.T) {
 	testUser := NewDTopUser("ho", "dor")
 	users := []DTopUser{*testUser}
-	cfg := NewDTopConfiguration("name", "description", users, "static", 12345)
+	testService := NewService("service")
+	services := []Service{*testService}
+	cfg := NewDTopConfiguration("name", "description", users, "static", 12345, services)
 	auth := NewAuthenticator(cfg)
 
 	if ok, _ := auth.Login("mscott", "theboss"); ok {
