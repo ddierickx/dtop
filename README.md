@@ -2,14 +2,14 @@
 
 A web-based implementation of the excellent [htop project](http://htop.sourceforge.net).
 
-## introduction ##
+## Introduction ##
 
 dtop is a tool that tries to deliver a large part of htop's realtime functionality to the webbrowser. It is currently very much a work in progress so please feel free to add features and improve!
 
 ![Image](/doc/screenshot1.png?raw=true)
 ![Image](/doc/screenshot2.png?raw=true)
 
-## features ##
+## Features ##
 
 *   using Golang so no runtime requirements needed after compilation
 *   only uses resources when the UI is accessed (and not a lot)
@@ -26,7 +26,7 @@ dtop is a tool that tries to deliver a large part of htop's realtime functionali
 *	basic process search functionality
 *   mobile / tablet compatible ui
 
-## installation ##
+## Installation ##
 
 I'm currently working on hosting packages somewhere so precompiled binaries or packages are not yet available unfortunately. However, you can easily create these packages yourself by following the steps in development => distribution. If you only require the binary, you can use (Golang compiler required):
 
@@ -40,7 +40,7 @@ or to just create the binary for an adhoc run:
 
 The binary should be in bin/linux-amd64
 
-### run adhoc
+### Run adhoc
 
 You can start dtop as follows:
 
@@ -93,7 +93,7 @@ When configured like this, a login dialog will appear before the dashboard is sh
 
 Please note that the password is not hashed yet...
 
-### run as a daemon
+### Run as a daemon
 
 Assuming you have the correct packages for your OS (see development => distribution). The deamon, dtopd, will be installed by default along with the package.
 
@@ -107,7 +107,7 @@ The static files are in /usr/local/share/dtop/static
 
 The binary file (dtop) is in /usr/bin/dtop
 
-## development ##
+## Development ##
 
 dtop is developed in [Go](http://golang.org) so you need the go compiler.
 
@@ -119,7 +119,7 @@ Clone the repo and cd into it.
 
 A Makefile is available with several helpful commands: test, format, build-all, dist-all, ... Note that they require that GOPATH and GOROOT are set.
 
-### distribution ###
+### Distribution ###
 
 To ease the creation of packages for different OSes a Vagrantfile is available to create these packages. The VM can be found in the scripts/vm-distribution folder. If you have Vagrant and Virtualbox installed you can simply execute:
 
@@ -127,7 +127,7 @@ To ease the creation of packages for different OSes a Vagrantfile is available t
 
 This should create RPM and DEB packages for the i386 and amd64 in the dist folder.
 
-## todo ##
+## TODO ##
 
 *   provide pre-compiled binaries or packages (rpm/deb)
 *   make (install) script based on install-dtopd.sh
