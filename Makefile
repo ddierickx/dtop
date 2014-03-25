@@ -37,11 +37,12 @@ dist-linux-deb-amd64 :
 	cp bin/linux-amd64/dtop /usr/bin/ -f
 	mkdir -p /usr/local/share/dtop
 	mkdir -p /etc/dtop
+	mkdir -p dist
+	
 	cp static /usr/local/share/dtop -rf
 	cp scripts/debian/dtopd -f /etc/init.d/
 	cp conf/distribution.json /etc/dtop/default.json
 
-	mkdir -p dist
 	fpm -s dir \
 		-t deb \
 		--provides "$(DIST_NAME)" \
@@ -65,9 +66,13 @@ dist-linux-rpm-amd64 :
 	$(info Packaging linux amd64 rpm distribution)
 	cp bin/linux-amd64/dtop /usr/bin/ -f
 	mkdir -p /usr/local/share/dtop
+	mkdir -p /etc/dtop
+	mkdir -p dist
+
 	cp static /usr/local/share/dtop -rf
 	cp scripts/rhel/dtopd -f /etc/init.d/
-	mkdir -p dist
+	cp conf/distribution.json /etc/dtop/default.json
+
 	fpm -s dir \
 		-t rpm \
 		--depends "redhat-lsb-core" \
@@ -85,15 +90,20 @@ dist-linux-rpm-amd64 :
 		--after-install "scripts/rhel/run" \
 		"/usr/bin/dtop" \
 		"/usr/local/share/dtop/static" \
-		"/etc/init.d/dtopd"
+		"/etc/init.d/dtopd" \
+		"/etc/dtop/default.json"
 
 dist-linux-rpm-386 :
 	$(info Packaging linux 386 rpm distribution)
 	cp bin/linux-386/dtop /usr/bin/ -f
 	mkdir -p /usr/local/share/dtop
+	mkdir -p /etc/dtop
+	mkdir -p dist
+	
 	cp static /usr/local/share/dtop -rf
 	cp scripts/rhel/dtopd -f /etc/init.d/
-	mkdir -p dist
+	cp conf/distribution.json /etc/dtop/default.json
+
 	fpm -s dir \
 		-t rpm \
 		--depends "redhat-lsb-core" \
@@ -110,15 +120,20 @@ dist-linux-rpm-386 :
 		--after-install "scripts/rhel/run" \
 		"/usr/bin/dtop" \
 		"/usr/local/share/dtop/static" \
-		"/etc/init.d/dtopd"
+		"/etc/init.d/dtopd" \
+		"/etc/dtop/default.json"
 
 dist-linux-deb-386 :
 	$(info Packaging linux 386 deb distribution)
 	cp bin/linux-386/dtop /usr/bin/ -f
 	mkdir -p /usr/local/share/dtop
+	mkdir -p /etc/dtop
+	mkdir -p dist
+	
 	cp static /usr/local/share/dtop -rf
 	cp scripts/debian/dtopd -f /etc/init.d/
-	mkdir -p dist
+	cp conf/distribution.json /etc/dtop/default.json
+
 	fpm -s dir \
 		-t deb \
 		--provides "$(DIST_NAME)" \
@@ -135,6 +150,7 @@ dist-linux-deb-386 :
 		--after-install "scripts/debian/run" \
 		"/usr/bin/dtop" \
 		"/usr/local/share/dtop/static" \
+		"/etc/dtop/default.json" \
 		"/etc/init.d/dtopd"
 
 run : test
