@@ -17,7 +17,7 @@ PIDFILE=/var/run/$NAME.pid
 #This is the command to be run, give the full pathname
 DAEMON_ROOT=/usr/local/share/dtop
 DAEMON=/usr/bin/dtop
-DAEMON_OPTS="--port 12345"
+DAEMON_OPTS="-c /etc/dtop/default.json"
 
 case "$1" in
 start)

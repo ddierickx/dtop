@@ -1,0 +1,15 @@
+{
+    "Name": "my server",
+    "Description": "my description",
+    "StaticFolder": "/usr/local/share/dtop/static",
+    "Port": 12345,
+    "Services": [
+        { "Name": "ufw" },
+        { "Name": "ssh" },
+        { "Name": "cups" },
+        { "Name": "tomcat6" },
+        { "Name": "puppet" },
+        { "Name": "nfs-kernel-server" },
+        { "Name": "postgresql" }
+    ]
+ }

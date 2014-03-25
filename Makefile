@@ -36,8 +36,11 @@ dist-linux-deb-amd64 :
 	$(info Packaging linux amd64 deb distribution)
 	cp bin/linux-amd64/dtop /usr/bin/ -f
 	mkdir -p /usr/local/share/dtop
+	mkdir -p /etc/dtop
 	cp static /usr/local/share/dtop -rf
 	cp scripts/debian/dtopd -f /etc/init.d/
+	cp conf/distribution.json /etc/dtop/default.json
+
 	mkdir -p dist
 	fpm -s dir \
 		-t deb \
@@ -55,7 +58,8 @@ dist-linux-deb-amd64 :
 		--after-install "scripts/debian/run" \
 		"/usr/bin/dtop" \
 		"/usr/local/share/dtop/static" \
-		"/etc/init.d/dtopd"
+		"/etc/init.d/dtopd" \
+		"/etc/dtop/default.json"
 
 dist-linux-rpm-amd64 :
 	$(info Packaging linux amd64 rpm distribution)
