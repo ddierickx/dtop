@@ -6,10 +6,10 @@ A web-based implementation of the excellent [htop project](http://htop.sourcefor
 
 dtop is a tool that tries to deliver a large part of htop's realtime functionality to the webbrowser. It is currently very much a work in progress so please feel free to add features and improve!
 
-## features ##
-
 ![Image](/doc/screenshot1.png?raw=true)
 ![Image](/doc/screenshot2.png?raw=true)
+
+## features ##
 
 *   using Golang so no runtime requirements needed after compilation
 *   only uses resources when the UI is accessed (and not a lot)
