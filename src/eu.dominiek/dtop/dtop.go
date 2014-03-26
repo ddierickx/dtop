@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-const VERSION = "1.0-SNAPSHOT"
+const VERSION = "0.1-SNAPSHOT"
 
 var configFile = flag.String("c", "", "the location of the server configuration")
 var debug *bool = flag.Bool("d", false, "enable debug logging")
