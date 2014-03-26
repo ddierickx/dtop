@@ -28,7 +28,7 @@ dtop is a tool that tries to deliver a large part of htop's realtime functionali
 
 ## Installation ##
 
-**Note:* packaging in rpm and deb is currently in the works so there may be some issues since I only tested them on CentOS and Ubuntu. Nonetheless, please give them a try and report any problems you might experience.
+**Note:** packaging in rpm and deb is currently in the works so there may be some issues since I only tested them on CentOS and Ubuntu. Nonetheless, please give them a try and report any problems you might experience.
 
 **amd64**
 
