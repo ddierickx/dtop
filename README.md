@@ -144,6 +144,7 @@ This should create RPM and DEB packages for the i386 and amd64 in the dist folde
 
 ## TODO ##
 
+*	Javascript refactoring / cleaning
 *	OSX support
 *   provide pre-compiled binaries or packages (rpm/deb)
 *   make (install) script based on install-dtopd.sh
