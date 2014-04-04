@@ -13,18 +13,14 @@ import (
 	"time"
 )
 
-// Default delay for publisher data refresh
-const DELAY = 1 * time.Second
-
 // Function template for event publishers.
 type EventPublisher func(events chan Event)
 
-func FailSafe(eventPublisher func(events chan Event)) EventPublisher {
+func failSafe(eventPublisher func(events chan Event)) EventPublisher {
 	f := func(events chan Event) {
 		defer func() {
 			if r := recover(); r != nil {
 				log.Printf("Recovered from EventPublisher failure: %s", r)
-				time.Sleep(DELAY)
 			}
 		}()
 		eventPublisher(events)
@@ -32,85 +28,110 @@ func FailSafe(eventPublisher func(events chan Event)) EventPublisher {
 	return f
 }
 
+func Repeat(eventPublisher func(events chan Event), interval time.Duration) EventPublisher {
+	failSafePublisher := failSafe(eventPublisher)
+
+	f := func(events chan Event) {
+		for {
+			failSafePublisher(events)
+			time.Sleep(interval)
+		}
+	}
+	return f
+}
+
+func Benchmark(eventPublisher func(events chan Event)) EventPublisher {
+	total := time.Duration(0)
+	n := 0
+
+	f := func(events chan Event) {
+		start := time.Now()
+		log.Printf("polling")
+		eventPublisher(events)
+		n = n + 1
+		total = total + time.Since(start)
+
+		if n%10 == 0 {
+			log.Printf("Took %d", n)
+		}
+	}
+	return f
+}
+
 // Process info publisher function which parses `ps` output into a ProcessInfo array and broadcasts it on the event channel.
 func processinfo(events chan Event) {
-	for {
-		output, err := capture_stdout("ps", "auxh")
+	output, err := capture_stdout("ps", []string{"auxh"})
 
-		if err != nil {
-			panic(fmt.Sprintf("Error obtaining process info: %s", err))
-		}
-
-		var processInfos []ProcessInfo
-
-		// iterate over each line, parsing is a bit annoying, basically space marks a new column
-		// but the last column 'command' (10) can contain spaces so cut that one out.
-		for _, line := range output {
-			var values []string
-			prevSpace := false
-			value := ""
-
-			// tokenize column values
-			for i, char := range line {
-				// command can have spaces in it but is the last column.
-				if len(values) == 10 {
-					values = append(values, line[i:])
-					break
-				}
-
-				if char == ' ' && !prevSpace {
-					values = append(values, strings.TrimSpace(value))
-					value = ""
-					prevSpace = true
-				} else if char != ' ' && prevSpace {
-					value = value + string(char)
-					prevSpace = false
-				} else {
-					value = value + string(char)
-				}
-			}
-
-			// Example header: USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND */
-			pid := 0
-			user := ""
-			cpu := 0.0
-			mem := 0.0
-			command := ""
-
-			// TODO: parse missing values compared to htop.
-			for column, value := range values {
-				switch column {
-				case 0:
-					user = value
-				case 1:
-					pid = atoi(value)
-				case 2:
-					cpu = atof(value)
-				case 3:
-					mem = atof(value)
-				case 10:
-					command = value
-				}
-			}
-
-			processInfo := NewProcessInfo(pid, user, 0, 0, 0, 0, 0, "", cpu, mem, 0, command)
-			processInfos = append(processInfos, processInfo)
-		}
-
-		events <- NewEvent("sys.processes", processInfos)
-
-		time.Sleep(DELAY)
+	if err != nil {
+		panic(fmt.Sprintf("Error obtaining process info: %s", err))
 	}
+
+	var processInfos []ProcessInfo
+
+	// iterate over each line, parsing is a bit annoying, basically space marks a new column
+	// but the last column 'command' (10) can contain spaces so cut that one out.
+	for _, line := range output {
+		var values []string
+		prevSpace := false
+		value := ""
+
+		// tokenize column values
+		for i, char := range line {
+			// command can have spaces in it but is the last column.
+			if len(values) == 10 {
+				values = append(values, line[i:])
+				break
+			}
+			if char == ' ' && !prevSpace {
+				values = append(values, strings.TrimSpace(value))
+				value = ""
+				prevSpace = true
+			} else if char != ' ' && prevSpace {
+				value = value + string(char)
+				prevSpace = false
+			} else {
+				value = value + string(char)
+			}
+		}
+
+		// Example header: USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND */
+		pid := 0
+		user := ""
+		cpu := 0.0
+		mem := 0.0
+		command := ""
+
+		// TODO: parse missing values compared to htop.
+		for column, value := range values {
+			switch column {
+			case 0:
+				user = value
+			case 1:
+				pid = atoi(value)
+			case 2:
+				cpu = atof(value)
+			case 3:
+				mem = atof(value)
+			case 10:
+				command = value
+			}
+		}
+
+		processInfo := NewProcessInfo(pid, user, 0, 0, 0, 0, 0, "", cpu, mem, 0, command)
+		processInfos = append(processInfos, processInfo)
+	}
+
+	events <- NewEvent("sys.processes", processInfos)
 }
 
 // Parse '/proc/stat' to find cpu usage per core.
-func cpuinfo(events chan Event) {
+func cpuinfo() func(events chan Event) {
 	singlespace := regexp.MustCompile("\\ +")
 	prevTotal := make(map[int]int)
 	prevIdle := make(map[int]int)
 	currentUsage := make(map[int]float64)
 
-	for {
+	return func(events chan Event) {
 		data, err := ioutil.ReadFile("/proc/stat")
 
 		if err == nil {
@@ -163,145 +184,123 @@ func cpuinfo(events chan Event) {
 
 			events <- NewEvent("sys.cpu", cpuUsages)
 		}
-
-		time.Sleep(DELAY)
 	}
 }
 
 // Parse '/proc/meminfo' to get memory info.
 func memory(events chan Event) {
-	for {
-		data, err := ioutil.ReadFile("/proc/meminfo")
+	data, err := ioutil.ReadFile("/proc/meminfo")
 
-		if err == nil {
-			lines := strings.Split(string(data), "\n")
-			values := make(map[string]int)
+	if err == nil {
+		lines := strings.Split(string(data), "\n")
+		values := make(map[string]int)
 
-			for _, line := range lines {
-				columns := strings.Split(line, ":")
+		for _, line := range lines {
+			columns := strings.Split(line, ":")
 
-				if len(columns) >= 2 {
-					key := columns[0]
-					value := strings.TrimSpace(strings.Replace(columns[1], "kB", "", -1))
-					intValue, cerr := strconv.Atoi(value)
+			if len(columns) >= 2 {
+				key := columns[0]
+				value := strings.TrimSpace(strings.Replace(columns[1], "kB", "", -1))
+				intValue, cerr := strconv.Atoi(value)
 
-					if cerr == nil {
-						values[key] = intValue
-					}
+				if cerr == nil {
+					values[key] = intValue
 				}
 			}
-
-			totalKb := values["MemTotal"]
-			freeKb := values["MemFree"]
-			sharedKb := 0 // unused in modern kernels but kept here for reference.
-			buffersKb := values["Buffers"]
-			cachedKb := values["Cached"]
-			swapTotalKb := values["SwapTotal"]
-			swapFreeKb := values["SwapFree"]
-
-			events <- NewEvent("sys.memory", NewMemoryUsage(totalKb, freeKb, sharedKb, buffersKb, cachedKb, swapTotalKb, swapFreeKb))
 		}
 
-		time.Sleep(DELAY)
+		totalKb := values["MemTotal"]
+		freeKb := values["MemFree"]
+		sharedKb := 0 // unused in modern kernels but kept here for reference.
+		buffersKb := values["Buffers"]
+		cachedKb := values["Cached"]
+		swapTotalKb := values["SwapTotal"]
+		swapFreeKb := values["SwapFree"]
+
+		events <- NewEvent("sys.memory", NewMemoryUsage(totalKb, freeKb, sharedKb, buffersKb, cachedKb, swapTotalKb, swapFreeKb))
 	}
 }
 
 // Run 'w' command and parse output to get logged in users list.
 func users(events chan Event) {
-	for {
-		output, err := capture_stdout("/usr/bin/w", "-h")
+	output, err := capture_stdout("/usr/bin/w", []string{"-h"})
 
-		if err != nil {
-			panic(fmt.Sprintf("error obtaining user list: %s", err))
-		}
-
-		var all []User
-
-		for _, line := range output {
-			columns := strings.Split(line, " ")
-
-			if columns[0] != "" {
-				user := NewUser(columns[0])
-				all = append(all, user)
-			}
-		}
-
-		events <- NewEvent("sys.users", NewUsers(all))
-
-		time.Sleep(DELAY)
+	if err != nil {
+		panic(fmt.Sprintf("error obtaining user list: %s", err))
 	}
+
+	var all []User
+
+	for _, line := range output {
+		columns := strings.Split(line, " ")
+
+		if columns[0] != "" {
+			user := NewUser(columns[0])
+			all = append(all, user)
+		}
+	}
+
+	events <- NewEvent("sys.users", NewUsers(all))
 }
 
 // Run 'df' command and parse output to get disk usage statistics.
 func disk(events chan Event) {
-	for {
-		output, err := capture_stdout("df", "-Tlh")
-		// replace separator (todo: this will fail if a field value contains spaces...)
-		spaces := regexp.MustCompile("[\\ ]+")
+	output, err := capture_stdout("df", []string{"-Tlh"})
+	// replace separator (todo: this will fail if a field value contains spaces...)
+	spaces := regexp.MustCompile("[\\ ]+")
 
-		if err != nil && output == nil {
-			panic(fmt.Sprintf("error obtaining disk free: %s", err))
-		}
-
-		var all []DiskInfo
-
-		for _, line := range output {
-			line = spaces.ReplaceAllString(line, "|")
-			columns := strings.Split(line, "|")
-
-			if len(columns) == 7 && !strings.HasPrefix(strings.ToLower(line), "filesystem") {
-				name := columns[0]
-				diskType := columns[1]
-				size := columns[2]
-				used := columns[3]
-				available := columns[4]
-				usedPct := columns[5]
-				mountPoint := columns[6]
-
-				diskInfo := NewDiskInfo(name, diskType, size, used, available, usedPct, mountPoint)
-				all = append(all, diskInfo)
-			}
-		}
-
-		events <- NewEvent("sys.disk", all)
-
-		time.Sleep(DELAY)
+	if err != nil && output == nil {
+		panic(fmt.Sprintf("error obtaining disk free: %s", err))
 	}
+
+	var all []DiskInfo
+
+	for _, line := range output {
+		line = spaces.ReplaceAllString(line, "|")
+		columns := strings.Split(line, "|")
+
+		if len(columns) == 7 && !strings.HasPrefix(strings.ToLower(line), "filesystem") {
+			name := columns[0]
+			diskType := columns[1]
+			size := columns[2]
+			used := columns[3]
+			available := columns[4]
+			usedPct := columns[5]
+			mountPoint := columns[6]
+
+			diskInfo := NewDiskInfo(name, diskType, size, used, available, usedPct, mountPoint)
+			all = append(all, diskInfo)
+		}
+	}
+
+	events <- NewEvent("sys.disk", all)
 }
 
 // Parse '/proc/loadavg' to get system load averages.
 func loadavg(events chan Event) {
-	for {
-		data, err := ioutil.ReadFile("/proc/loadavg")
+	data, err := ioutil.ReadFile("/proc/loadavg")
 
-		if err == nil {
-			loadavg := strings.Split(string(data), " ")
-			avg1, _ := strconv.ParseFloat(loadavg[0], 64)
-			avg5, _ := strconv.ParseFloat(loadavg[1], 64)
-			avg15, _ := strconv.ParseFloat(loadavg[2], 64)
+	if err == nil {
+		loadavg := strings.Split(string(data), " ")
+		avg1, _ := strconv.ParseFloat(loadavg[0], 64)
+		avg5, _ := strconv.ParseFloat(loadavg[1], 64)
+		avg15, _ := strconv.ParseFloat(loadavg[2], 64)
 
-			events <- NewEvent("sys.loadavg", NewLoadAverage(avg1, avg5, avg15))
-		} else {
-			panic("LoadAvg: " + err.Error())
-		}
-
-		time.Sleep(DELAY)
+		events <- NewEvent("sys.loadavg", NewLoadAverage(avg1, avg5, avg15))
+	} else {
+		panic("LoadAvg: " + err.Error())
 	}
 }
 
 // Run 'uptime' and parse output to get system uptime in seconds.
 func uptime(events chan Event) {
-	for {
-		data, err := ioutil.ReadFile("/proc/uptime")
+	data, err := ioutil.ReadFile("/proc/uptime")
 
-		if err == nil {
-			uptime := strings.Split(string(data), " ")[0]
-			events <- NewEvent("sys.uptime", uptime)
-		} else {
-			panic("Uptime: " + err.Error())
-		}
-
-		time.Sleep(DELAY)
+	if err == nil {
+		uptime := strings.Split(string(data), " ")[0]
+		events <- NewEvent("sys.uptime", uptime)
+	} else {
+		panic("Uptime: " + err.Error())
 	}
 }
 
@@ -313,13 +312,13 @@ func basicinfo(events chan Event) {
 		panic(fmt.Sprintf("Unable to get hostname: '%s'", hn_err))
 	}
 
-	release, rl_err := capture_stdout("lsb_release", "-sd")
+	release, rl_err := capture_stdout("lsb_release", []string{"-sd"})
 
 	if rl_err != nil {
 		panic(fmt.Sprintf("Unable to run lsb_release: '%s'", rl_err))
 	}
 
-	uname, un_err := capture_stdout("uname", "-sr")
+	uname, un_err := capture_stdout("uname", []string{"-sr"})
 
 	if un_err != nil {
 		panic(fmt.Sprintf("Unable to run uname: '%s'", un_err))
@@ -332,31 +331,36 @@ func basicinfo(events chan Event) {
 // Run 'service status'.
 func services(services []Service) func(events chan Event) {
 	return func(events chan Event) {
-		for {
-			var serviceInfos []ServiceInfo
+		var serviceInfos []ServiceInfo
 
-			for _, service := range services {
-				var serviceInfo ServiceInfo
-				_, err := capture_stdout(fmt.Sprintf("/etc/init.d/%s", service.Name), "status")
+		for _, service := range services {
+			var serviceInfo ServiceInfo
+			out, err := capture_stdout("initctl", []string{"status", service.Name})
 
-				if err == nil {
-					serviceInfo = NewServiceInfo(service.Name, true)
-				} else {
-					serviceInfo = NewServiceInfo(service.Name, false)
+			// Valid output
+			if err == nil && len(out) > 0 {
+				running := false
+
+				if strings.Contains(out[0], "start/running") {
+					running = true
 				}
 
-				serviceInfos = append(serviceInfos, serviceInfo)
+				serviceInfo = NewServiceInfo(service.Name, running)
+			} else {
+				// Invalid output
+				serviceInfo = NewServiceInfo(service.Name, false)
 			}
 
-			events <- NewEvent("sys.services", serviceInfos)
-			time.Sleep(DELAY)
+			serviceInfos = append(serviceInfos, serviceInfo)
 		}
+
+		events <- NewEvent("sys.services", serviceInfos)
 	}
 }
 
 // Capture stdout when running the cmd with the given arguments. Output is split on newline.
-func capture_stdout(cmd string, args string) ([]string, error) {
-	command := exec.Command(cmd, args)
+func capture_stdout(cmd string, args []string) ([]string, error) {
+	command := exec.Command(cmd, args...)
 	stdout, err := command.StdoutPipe()
 
 	if err != nil {

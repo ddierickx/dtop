@@ -1,3 +1,4 @@
+./dtop
 scripts/vm-centos/.vagrant
 scripts/vm-distribution/.vagrant
 bin

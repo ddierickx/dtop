@@ -1,13 +1,11 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
+	"time"
 )
 
 const VERSION = "1.0-SNAPSHOT"
@@ -15,42 +13,13 @@ const VERSION = "1.0-SNAPSHOT"
 var configFile = flag.String("c", "", "the location of the server configuration")
 var debug *bool = flag.Bool("d", false, "enable debug logging")
 
-// Load the configuration and do the necessary error handling.
-func loadConfigFile(path string) (*DTopConfiguration, error) {
-	if path == "" {
-		return nil, errors.New("Please supply a valid configuration file (-c).")
-	}
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, errors.New(fmt.Sprintf("The configuration file does not exist: %s", path))
-	}
-
-	jsonBlob, err := ioutil.ReadFile(path)
-
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Error reading configuration file: %s", err.Error()))
-	}
-
-	cfg, err := DeserializeDTopConfigurationFromJson(jsonBlob)
-
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Error parsing configuration file: %s", err.Error()))
-	}
-
-	if valid, err := cfg.IsValid(); !valid {
-		return cfg, errors.New(fmt.Sprintf("Invalid configuration: %s", err.Error()))
-	}
-
-	return cfg, nil
-}
-
 // entry point
 func main() {
 	// parse cli args
 	flag.Parse()
 
 	log.Printf("Reading configuration from '%s'", *configFile)
-	cfg, cfgError := loadConfigFile(*configFile)
+	cfg, cfgError := LoadConfigFile(*configFile)
 
 	if cfgError != nil {
 		panic(cfgError)
@@ -59,12 +28,22 @@ func main() {
 	auth := NewAuthenticator(cfg)
 
 	// registered publishers
-	eventPublishers := [...]EventPublisher{memory, uptime, loadavg, cpuinfo, users, processinfo, basicinfo, disk, services(cfg.Services)}
+	eventPublishers := [...]EventPublisher{
+		Repeat(memory, 2*time.Second),
+		Repeat(uptime, 1*time.Second),
+		Repeat(loadavg, 2*time.Second),
+		Repeat(cpuinfo(), 1*time.Second),
+		Repeat(users, 3*time.Second),
+		Repeat(processinfo, 1*time.Second),
+		Repeat(basicinfo, 1*time.Hour),
+		Repeat(disk, 3*time.Second),
+		Repeat(services(cfg.Services), 2*time.Second),
+	}
 
 	// start publishers.
 	events := make(chan Event)
 	for _, eventPublisher := range eventPublishers {
-		go FailSafe(eventPublisher)(events)
+		go eventPublisher(events)
 	}
 
 	eventServer := NewEventServer(events, jsonEventSerializer)

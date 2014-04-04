@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 )
 
@@ -76,6 +77,35 @@ func (cfg *DTopConfiguration) IsValid() (bool, error) {
 	}
 
 	return true, nil
+}
+
+// Load the configuration and do the necessary error handling.
+func LoadConfigFile(path string) (*DTopConfiguration, error) {
+	if path == "" {
+		return nil, errors.New("Please supply a valid configuration file (-c).")
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return nil, errors.New(fmt.Sprintf("The configuration file does not exist: %s", path))
+	}
+
+	jsonBlob, err := ioutil.ReadFile(path)
+
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Error reading configuration file: %s", err.Error()))
+	}
+
+	cfg, err := DeserializeDTopConfigurationFromJson(jsonBlob)
+
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Error parsing configuration file: %s", err.Error()))
+	}
+
+	if valid, err := cfg.IsValid(); !valid {
+		return cfg, errors.New(fmt.Sprintf("Invalid configuration: %s", err.Error()))
+	}
+
+	return cfg, nil
 }
 
 // Performs serialization to JSON of a DTopConfiguration.
