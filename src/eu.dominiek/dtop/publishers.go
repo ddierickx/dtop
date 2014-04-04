@@ -324,8 +324,12 @@ func basicinfo(events chan Event) {
 		panic(fmt.Sprintf("Unable to run uname: '%s'", un_err))
 	}
 
-	basicInfo := NewBasicInfo(hostname, uname[0], release[0])
+	basicInfo := NewBasicInfo(hostname, uname[0], clean_distro(release[0]))
 	events <- NewEvent("sys.basics", basicInfo)
+}
+
+func clean_distro(distro string) string {
+	return strings.Replace(distro, "\"", "", -1)
 }
 
 // Run 'service status'.
