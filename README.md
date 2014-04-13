@@ -32,17 +32,17 @@ dtop is a tool that tries to deliver a large part of htop's realtime functionali
 
 **amd64**
 
-[dtop_0.1-SNAPSHOT-linux-amd64.deb](https://www.dropbox.com/s/6ojuotr6telttm9/dtop_0.1-SNAPSHOT-linux-amd64.deb)
-[dtop_0.1_SNAPSHOT-linux-amd64.rpm](https://www.dropbox.com/s/8lv07hy55cnyqiz/dtop_0.1_SNAPSHOT-linux-amd64.rpm)
+* [dtop_0.1-SNAPSHOT-linux-amd64.deb](https://www.dropbox.com/s/6ojuotr6telttm9/dtop_0.1-SNAPSHOT-linux-amd64.deb)
+* [dtop_0.1_SNAPSHOT-linux-amd64.rpm](https://www.dropbox.com/s/8lv07hy55cnyqiz/dtop_0.1_SNAPSHOT-linux-amd64.rpm)
 
 **i386**
 
-[dtop_0.1-SNAPSHOT-linux-i386.deb](https://www.dropbox.com/s/jgrkmbh8j7fzs8c/dtop_0.1-SNAPSHOT-linux-i386.deb)
-[dtop_0.1_SNAPSHOT-linux-i386.rpm](https://www.dropbox.com/s/yxrgsoc484ej4cr/dtop_0.1_SNAPSHOT-linux-i386.rpm)
+* [dtop_0.1-SNAPSHOT-linux-i386.deb](https://www.dropbox.com/s/jgrkmbh8j7fzs8c/dtop_0.1-SNAPSHOT-linux-i386.deb)
+* [dtop_0.1_SNAPSHOT-linux-i386.rpm](https://www.dropbox.com/s/yxrgsoc484ej4cr/dtop_0.1_SNAPSHOT-linux-i386.rpm)
 
-The configuration files are in `/etc/dtop/`
+The configuration files are stored in `/etc/dtop/`
 
-The static files are in `/usr/local/share/dtop/static`
+The static files are stored in `/usr/local/share/dtop/static`
 
 The binary file (`dtop`) is in `/usr/bin/dtop`
 
