@@ -33,17 +33,22 @@ dtop is a tool that tries to deliver a large part of htop's realtime functionali
 **amd64**
 
 [dtop_0.1-SNAPSHOT-linux-amd64.deb](https://www.dropbox.com/s/6ojuotr6telttm9/dtop_0.1-SNAPSHOT-linux-amd64.deb)
-
 [dtop_0.1_SNAPSHOT-linux-amd64.rpm](https://www.dropbox.com/s/8lv07hy55cnyqiz/dtop_0.1_SNAPSHOT-linux-amd64.rpm)
 
 **i386**
 
 [dtop_0.1-SNAPSHOT-linux-i386.deb](https://www.dropbox.com/s/jgrkmbh8j7fzs8c/dtop_0.1-SNAPSHOT-linux-i386.deb)
-
 [dtop_0.1_SNAPSHOT-linux-i386.rpm](https://www.dropbox.com/s/yxrgsoc484ej4cr/dtop_0.1_SNAPSHOT-linux-i386.rpm)
 
+The configuration files are in `/etc/dtop/`
 
-I'm currently working on hosting packages somewhere so precompiled binaries or packages are not yet available unfortunately. However, you can easily create these packages yourself by following the steps in development => distribution. If you only require the binary, you can use (Golang compiler required):
+The static files are in `/usr/local/share/dtop/static`
+
+The binary file (`dtop`) is in `/usr/bin/dtop`
+
+You can easily create these packages yourself by following the steps in Development => Distribution.
+
+If you only require the binary, you can use (Golang compiler required):
 
 > export GOPATH=$(pwd)
 
@@ -115,12 +120,6 @@ Assuming you have the correct packages for your OS (see development => distribut
 The service can then be controlled as usual:
 
 > sudo service dtopd status|start|stop|restart
-
-The configuration files are in /etc/dtop/
-
-The static files are in /usr/local/share/dtop/static
-
-The binary file (dtop) is in /usr/bin/dtop
 
 ## Development ##
 
