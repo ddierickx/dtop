@@ -42,11 +42,11 @@ dtop is a tool that tries to deliver a large part of htop's realtime functionali
 
 To install the deb packages:
 
-	sudo dpkg -i dtop_0.1-SNAPSHOT-linux-amd64.deb
+> sudo dpkg -i dtop_0.1-SNAPSHOT-linux-amd64.deb
 
 For the rpm's (this requires redhat-lsb-core but should be installed automatically):
 
-	sudo yum localinstall dtop_0.1_SNAPSHOT-linux-amd64.rpm
+> sudo yum localinstall dtop_0.1_SNAPSHOT-linux-amd64.rpm
 
 The configuration files are stored in `/etc/dtop/`
 
