@@ -42,11 +42,11 @@ dtop is a tool that tries to deliver a large part of htop's realtime functionali
 
 To install the deb packages:
 
-> sudo dpkg -i dtop_0.1-SNAPSHOT-linux-amd64.deb
+	sudo dpkg -i dtop_0.1-SNAPSHOT-linux-amd64.deb
 
 For the rpm's (this requires redhat-lsb-core but should be installed automatically):
 
-> sudo yum localinstall dtop_0.1_SNAPSHOT-linux-amd64.rpm
+	sudo yum localinstall dtop_0.1_SNAPSHOT-linux-amd64.rpm
 
 The configuration files are stored in `/etc/dtop/`
 
@@ -58,13 +58,12 @@ You can easily create these packages yourself by following the steps in Developm
 
 If you only require the binary, you can use (Golang compiler required):
 
-> export GOPATH=$(pwd)
-
-> make run
+	export GOPATH=$(pwd)
+	make run
 
 or to just create the binary for an adhoc run:
 
-> make build-linux-amd64
+	make build-linux-amd64
 
 The binary should be in bin/linux-amd64
 
@@ -72,7 +71,7 @@ The binary should be in bin/linux-amd64
 
 You can start dtop as follows:
 
-> ./bin/linux-amd64/dtop -c conf/default.json
+	./bin/linux-amd64/dtop -c conf/default.json
 
 Then point your webbrowser at http://localhost:12345 and you should see the dashboard.
 
@@ -127,7 +126,7 @@ Assuming you have the correct packages for your OS (see development => distribut
 
 The service can then be controlled as usual:
 
-> sudo service dtopd status|start|stop|restart
+	sudo service dtopd status|start|stop|restart
 
 ## Development ##
 
@@ -135,9 +134,8 @@ dtop is developed in [Go](http://golang.org) so you need the go compiler.
 
 Clone the repo and cd into it.
 
-> git clone https://github.com/ddierickx/dtop
-
-> cd dtop
+	git clone https://github.com/ddierickx/dtop
+	cd dtop
 
 A Makefile is available with several helpful commands: test, format, build-all, dist-all, ... Note that they require that GOPATH and GOROOT are set.
 
@@ -145,7 +143,7 @@ A Makefile is available with several helpful commands: test, format, build-all, 
 
 To ease the creation of packages for different OSes a Vagrantfile is available to create these packages. The VM can be found in the scripts/vm-distribution folder. If you have Vagrant and Virtualbox installed you can simply execute:
 
-> vagrant up
+	vagrant up
 
 This should create RPM and DEB packages for the i386 and amd64 in the dist folder.
 
