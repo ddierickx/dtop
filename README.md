@@ -40,6 +40,14 @@ dtop is a tool that tries to deliver a large part of htop's realtime functionali
 * [dtop_0.1-SNAPSHOT-linux-i386.deb](https://www.dropbox.com/s/jgrkmbh8j7fzs8c/dtop_0.1-SNAPSHOT-linux-i386.deb)
 * [dtop_0.1_SNAPSHOT-linux-i386.rpm](https://www.dropbox.com/s/yxrgsoc484ej4cr/dtop_0.1_SNAPSHOT-linux-i386.rpm)
 
+To install the deb packages:
+
+	sudo dpkg -i dtop_0.1-SNAPSHOT-linux-amd64.deb
+
+For the rpm's (this requires redhat-lsb-core but should be installed automatically):
+
+	sudo yum localinstall dtop_0.1_SNAPSHOT-linux-amd64.rpm
+
 The configuration files are stored in `/etc/dtop/`
 
 The static files are stored in `/usr/local/share/dtop/static`
