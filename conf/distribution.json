@@ -1,7 +1,7 @@
 {
     "Name": "my server",
     "Description": "my description",
-    "StaticFolder": "/usr/local/share/dtop/static",
+    "StaticFolder": "/var/dtop/static",
     "Port": 12345,
     "Services": [
         { "Name": "ufw" },

@@ -16,7 +16,6 @@
 NAME=dtopd
 PIDFILE=/var/run/$NAME.pid
 #This is the command to be run, give the full pathname
-DAEMON_ROOT=/usr/local/share/dtop
 DAEMON=/usr/bin/dtop
 DAEMON_OPTS="-c /etc/dtop/default.json"
 SS="start-stop-daemon"
@@ -26,7 +25,7 @@ export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
 case "$1" in
   start)
     echo -n "Starting daemon: "$NAME"\n"
-	$SS --start --background -d $DAEMON_ROOT --pidfile $PIDFILE --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
+	$SS --start --background --pidfile $PIDFILE --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
 	;;
   stop)
     echo -n "Stopping daemon: "$NAME"\n"
@@ -44,7 +43,7 @@ case "$1" in
   restart)
     echo -n "Restarting daemon: "$NAME"\n"
 	$SS --stop --quiet --oknodo --retry 30 --pidfile $PIDFILE
-	$SS --start --background -d $DAEMON_ROOT --pidfile $PIDFILE --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
+	$SS --start --background --pidfile $PIDFILE --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
 	;;
   *)
 	echo "Usage: "$1" {start|stop|status|restart}"

@@ -15,16 +15,14 @@ DAEMON=dtop
 NAME=dtopd
 PIDFILE=/var/run/$NAME.pid
 #This is the command to be run, give the full pathname
-DAEMON_ROOT=/usr/local/share/dtop
 DAEMON=/usr/bin/dtop
 DAEMON_OPTS="-c /etc/dtop/default.json"
 
 case "$1" in
 start)
-	printf "%-50s" "Starting $NAME..."
-	cd $DAEMON_ROOT
-	PID=`$DAEMON $DAEMON_OPTS > /dev/null 2>&1 & echo $!`
-	#echo "Saving PID" $PID " to " $PIDFILE
+    	printf "%-50s" "Starting $NAME..."
+    	PID=`$DAEMON $DAEMON_OPTS > /dev/null 2>&1 & echo $!`
+    	#echo "Saving PID" $PID " to " $PIDFILE
         if [ -z $PID ]; then
             printf "%s\n" "Fail"
         else
@@ -47,8 +45,7 @@ status)
 ;;
 stop)
         printf "%-50s" "Stopping $NAME"
-            PID=`cat $PIDFILE`
-            cd $DAEMON_ROOT
+        PID=`cat $PIDFILE`
         if [ -f $PIDFILE ]; then
             kill -HUP $PID
             printf "%s\n" "Ok"

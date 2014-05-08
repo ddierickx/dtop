@@ -1,0 +1,4 @@
+#!/bin/sh
+service dtopd stop
+rm -rf /etc/dtop
+rm -rf /var/dtop
