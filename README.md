@@ -30,15 +30,10 @@ dtop is a tool that tries to deliver a large part of htop's realtime functionali
 
 **Note:** packaging in rpm and deb is currently in the works so there may be some issues since I only tested them on CentOS and Ubuntu. Nonetheless, please give them a try and report any problems you might experience.
 
-**amd64**
+* [dtop_0.1-linux-amd64.deb](http://www.do-jo.be/dtop/dtop_0.1-linux-amd64.deb)
+* [dtop_0.1-linux-amd64.rpm](http://www.do-jo.be/dtop/dtop_0.1-linux-amd64.rpm)
 
-* [dtop_0.1-linux-amd64.deb](https://www.dropbox.com/s/6ojuotr6telttm9/dtop_0.1-linux-amd64.deb)
-* [dtop_0.1-linux-amd64.rpm](https://www.dropbox.com/s/8lv07hy55cnyqiz/dtop_0.1-linux-amd64.rpm)
-
-**i386**
-
-* [dtop_0.1-linux-i386.deb](https://www.dropbox.com/s/jgrkmbh8j7fzs8c/dtop_0.1-linux-i386.deb)
-* [dtop_0.1-linux-i386.rpm](https://www.dropbox.com/s/yxrgsoc484ej4cr/dtop_0.1-linux-i386.rpm)
+Note: i386 packages are disabled because of an rpm building issue.
 
 To install the deb packages:
 
@@ -50,7 +45,7 @@ For the rpm's (this requires redhat-lsb-core but should be installed automatical
 
 The configuration files are stored in `/etc/dtop/`
 
-The static files are stored in `/usr/local/share/dtop/static`
+The static files are stored in `/var/dtop/static`
 
 The binary file (`dtop`) is in `/usr/bin/dtop`
 
@@ -98,7 +93,7 @@ If you'd like to require authentication, you need to adapt the configuration fil
 	{
 	    "Name": "my server",
 	    "Description": "my description",
-	    "StaticFolder": "/usr/local/share/dtop/static",
+	    "StaticFolder": "/var/dtop/static",
 	    "Port": 12345,
 	    "Users": [
 	    	{ "Username": "hodor", "Password": "hodorhodor" }
