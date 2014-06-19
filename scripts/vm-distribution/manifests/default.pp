@@ -1,5 +1,5 @@
 exec { "download-go":
-	command => "wget https://go.googlecode.com/files/go1.2.1.linux-amd64.tar.gz -O go.tar.gz",
+	command => "wget http://golang.org/dl/go1.3.linux-amd64.tar.gz -O /opt/go.tar.gz",
 	creates => "/opt/go.tar.gz",
 	cwd => "/opt/",
 	path => [ "/usr/bin/", "/bin/" ]
@@ -24,9 +24,9 @@ package { "fpm":
 exec {  "make-distros":
 	command => "make dist-all",
 	cwd => "/dtop-dist",
-	creates => [ "/dtop-dist/dist/dtop_0.1-linux-amd64.deb",
-				 "/dtop-dist/dist/dtop_0.1-linux-amd64.rpm",
-				 "/dtop-dist/dist/dtop_0.1-linux-i386.deb",
-				 "/dtop-dist/dist/dtop_0.1-linux-i386.rpm" ],
+	creates => [ "/dtop-dist/dist/dtop_0.3-linux-amd64.deb",
+				 "/dtop-dist/dist/dtop_0.3-linux-amd64.rpm",
+				 "/dtop-dist/dist/dtop_0.3-linux-i386.deb",
+				 "/dtop-dist/dist/dtop_0.3-linux-i386.rpm" ],
 	path => [ "/usr/bin/", "/usr/local/bin/", "/bin/" ]	
 }

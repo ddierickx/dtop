@@ -1,5 +1,5 @@
 DIST_NAME := dtop
-DIST_VERSION := 0.1
+DIST_VERSION := 0.3
 DIST_DESCRIPTION := A monitoring tools that brings htop like functionality and more to the webbrowser.
 DIST_VENDOR := Dominique Dierickx
 DIST_MAINTAINER := d.dierickx@gmail.com

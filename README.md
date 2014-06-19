@@ -30,18 +30,18 @@ dtop is a tool that tries to deliver a large part of htop's realtime functionali
 
 **Note:** packaging in rpm and deb is currently in the works so there may be some issues since I only tested them on CentOS and Ubuntu. Nonetheless, please give them a try and report any issues you might experience here on github.
 
-* [dtop_0.1-linux-amd64.deb](http://www.do-jo.be/dtop/dtop_0.1-linux-amd64.deb)
-* [dtop_0.1-linux-amd64.rpm](http://www.do-jo.be/dtop/dtop_0.1-linux-amd64.rpm)
+* [dtop_0.2-linux-amd64.deb](http://www.do-jo.be/dtop/dtop_0.2-linux-amd64.deb)
+* [dtop_0.2-linux-amd64.rpm](http://www.do-jo.be/dtop/dtop_0.2-linux-amd64.rpm)
 
 Note: i386 packages are disabled because of an rpm building issue.
 
 To install the deb packages:
 
-	sudo dpkg -i dtop_0.1-linux-amd64.deb
+	sudo dpkg -i dtop_0.2-linux-amd64.deb
 
 For the rpm's (this requires redhat-lsb-core but should be installed automatically):
 
-	sudo yum localinstall dtop_0.1-linux-amd64.rpm
+	sudo yum localinstall dtop_0.2-linux-amd64.rpm
 
 The configuration files are stored in `/etc/dtop/`
 
