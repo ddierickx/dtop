@@ -146,14 +146,11 @@ This should create RPM and DEB packages for the i386 and amd64 in the dist folde
 
 *	Javascript refactoring / cleaning
 *	OSX support
-*   provide pre-compiled binaries or packages (rpm/deb)
-*   make (install) script based on install-dtopd.sh
 *   re-add swap usage
 *	user defined sorting iso. cpu percentage
 *   a nice favicon/logo
 *	hash passwords
 *	processtree
-*	basic (?) authentication
 *	process kill feature
 *	htop like keyboard shortcuts
 *	implement Pri, Ni, Virt, Res, Shr, S, Time in process list.
