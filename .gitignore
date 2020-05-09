@@ -4,3 +4,5 @@ scripts/vm-distribution/.vagrant
 bin
 dist
 pkg
+.idea/
+
