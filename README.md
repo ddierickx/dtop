@@ -53,14 +53,9 @@ You can easily create these packages yourself by following the steps in Developm
 
 If you only require the binary, you can use (Golang compiler required):
 
-	export GOPATH=$(pwd)
-	make run
-
-or to just create the binary for an adhoc run:
-
-	make build-linux-amd64
-
-The binary should be in bin/linux-amd64
+```
+go build -o drun ./cmd/drun.go
+```
 
 ### Run adhoc
 

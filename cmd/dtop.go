@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/ddierickx/dtop/pkg"
 	"log"
 	"net/http"
 	"time"
@@ -19,42 +20,42 @@ func main() {
 	flag.Parse()
 
 	log.Printf("Reading configuration from '%s'", *configFile)
-	cfg, cfgError := LoadConfigFile(*configFile)
+	cfg, cfgError := pkg.LoadConfigFile(*configFile)
 
 	if cfgError != nil {
 		panic(cfgError)
 	}
 
-	auth := NewAuthenticator(cfg)
+	auth := pkg.NewAuthenticator(cfg)
 
 	// registered publishers
-	eventPublishers := [...]EventPublisher{
-		Repeat(memory, 2*time.Second),
-		Repeat(uptime, 1*time.Second),
-		Repeat(loadavg, 2*time.Second),
-		Repeat(cpuinfo(), 1*time.Second),
-		Repeat(users, 3*time.Second),
-		Repeat(processinfo, 1*time.Second),
-		Repeat(basicinfo, 1*time.Hour),
-		Repeat(disk, 3*time.Second),
-		Repeat(services(cfg.Services), 2*time.Second),
+	eventPublishers := [...]pkg.EventPublisher{
+		pkg.Repeat(pkg.GetMemory, 2*time.Second),
+		pkg.Repeat(pkg.GetUptime, 1*time.Second),
+		pkg.Repeat(pkg.GetLoadAvg, 2*time.Second),
+		pkg.Repeat(pkg.GetCPUInfo(), 1*time.Second),
+		pkg.Repeat(pkg.GetUsers, 3*time.Second),
+		pkg.Repeat(pkg.GetProcessInfo, 1*time.Second),
+		pkg.Repeat(pkg.GetBasicInfo, 1*time.Hour),
+		pkg.Repeat(pkg.GetDisk, 3*time.Second),
+		pkg.Repeat(pkg.GetServices(cfg.Services), 2*time.Second),
 	}
 
 	// start publishers.
-	events := make(chan Event)
+	events := make(chan pkg.Event)
 	for _, eventPublisher := range eventPublishers {
 		go eventPublisher(events)
 	}
 
-	eventServer := NewEventServer(events, jsonEventSerializer)
+	eventServer := pkg.NewEventServer(events, pkg.JsonEventSerializer)
 
 	// start fanout and monitor goroutines.
-	go eventServer.fanOut()
-	go eventServer.monitor()
+	go eventServer.FanOut()
+	go eventServer.Monitor()
 
 	// register http resources
 	http.Handle("/", http.FileServer(http.Dir(cfg.StaticFolder)))
-	http.Handle("/events", http.HandlerFunc(eventServer.handler))
+	http.Handle("/events", http.HandlerFunc(eventServer.Handler))
 	http.Handle("/auth", http.HandlerFunc(authHandler(eventServer, cfg, auth)))
 
 	log.Printf("starting server at 0.0.0.0:%d", cfg.Port)
@@ -66,15 +67,15 @@ func main() {
 }
 
 // the authHandler function decorator checks for credentials.
-func authHandler(eventServer *EventServer, cfg *DTopConfiguration, auth *Authenticator) func(http.ResponseWriter, *http.Request) {
+func authHandler(eventServer *pkg.EventServer, cfg *pkg.DTopConfiguration, auth *pkg.Authenticator) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
 			username := r.FormValue("username")
 			password := r.FormValue("password")
 
 			if success, token := auth.Login(username, password); success {
-				eventServer.eventListeners[token] = nil
-				w.Write([]byte(token))
+				eventServer.EventListeners[token] = nil
+				_, _ = w.Write([]byte(token))
 			} else {
 				log.Printf("received wrong login attempt (user=%s)", username)
 				http.Error(w, "bad credentials", 401)
@@ -85,14 +86,7 @@ func authHandler(eventServer *EventServer, cfg *DTopConfiguration, auth *Authent
 			msg := "{\"Name\":\"%s\",\"Auth\":%t,\"Description\":\"%s\",\"Version\":\"%s\"}"
 			auth := cfg.IsAuth()
 			msg = fmt.Sprintf(msg, cfg.Name, auth, cfg.Description, VERSION)
-			w.Write([]byte(msg))
+			_, _ = w.Write([]byte(msg))
 		}
-	}
-}
-
-// Debug when configured.
-func Debugf(format string, args ...interface{}) {
-	if *debug {
-		log.Printf("DEBUG "+format, args)
 	}
 }

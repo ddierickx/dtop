@@ -1,0 +1,11 @@
+{
+    "Name": "my server",
+    "Description": "my description",
+    "StaticFolder": "./static",
+    "Port": 8122,
+    "Services": [
+        { "Name": "ufw" },
+        { "Name": "ssh" },
+        { "Name": "cups" }
+    ]
+ }
